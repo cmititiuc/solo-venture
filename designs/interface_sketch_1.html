@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <style>
+            body, td, th {
+                font:normal normal 80%/1.2 tahoma, verdana, humanist san-serif; 
+            }
+            th {
+                font-weight: bold;
+                border-bottom: 1px solid black;
+            }
+            td {
+                text-align: center;
+            }
+            div.hero {
+                width: 200px;
+                border: 1px solid black;
+                /*display: inline-block;*/
+                float: left;
+                padding: 3px;
+                margin: 2px;
+            }
+            th, td {
+                /*border: 1px solid black;*/
+            }
+            ul {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            table {
+                width: 200px;
+                border-top: 1px solid black;
+                border-bottom: 1px solid black;
+                /*margin-left: -3px;
+                margin-right: -3px;*/
+            }
+            li {
+                margin-left: -10px;
+                list-style-type: square;
+            }
+            img.hero_portrait {
+                float: right;
+                margin-bottom: 2px;
+            }
+            textarea {
+                width: 100%;
+                height: 100px;
+            }
+            #map {
+                text-align: center;
+                width: 100%;
+                /*height: 500px;*/
+                border: 1px solid black;
+            }
+            #menu {
+                width: 100%;
+                /*border: 1px solid black;*/
+                text-align: right;
+            }
+            .status_menu_button {
+                cursor: pointer;
+                /*color: #369;*/
+                /*color: #008080;*/
+                color: #800000;
+                /*font-weight: bold;*/
+                display: block;
+            }
+            .menu_button {
+                cursor: pointer;
+                color: #008080;
+            }
+        </style>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script type="text/javascript">
+        $(document).ready(function() {
+
+            /* 
+             * toggles the lists on the hero cards and alters the +/- in the button name
+             */
+            $('.status_menu_button').click(function() {
+                $(this).next().toggle();
+                if ($(this).html().substring(0,3) == '[-]')
+                    var s = '[+]';
+                else
+                    var s = '[-]';
+                // replace the first 3 characters of string with contents of s
+                $(this).html(s + $(this).html().substring(3, $(this).html().length));
+
+            });
+
+            /*
+             * scrolls to bottom of textarea by default
+             */
+            $('textarea').scrollTop($('textarea')[0].scrollHeight);
+
+        });
+        </script>  
+    </head>
+
+    <body>
+        <div id='menu'>
+            first.last@example.com :: <span class="menu_button">Save</span> | <span class="menu_button">Quit</span> | <span class="menu_button">Logout</span>
+        </div>
+        <div id='map'>
+            <img src="sample_map.svg">
+        </div>
+<textarea readonly='readonly'>
+Elf's turn.
+Elf's movement roll: 3 + 5 = 8
+Elf moves 8 spaces.
+Elf opens a door.
+Elf throws Dagger at Orc.
+Attack roll: 1 die -> 1 Hit
+Orc defeated!
+Orc's turn.
+Orc moves 3 spaces.
+Orc attacks Elf.
+Attack roll: 3 dice -> 2 Hits
+Elf loses 2 Body points.
+</textarea>
+        <div class="hero">
+            Yor<br />
+            Barbarian<br />
+            <table>
+                <tr>
+                    <th>Attack</th>
+                    <th>Defend</th>
+                    <th>Body</th>
+                    <th>Mind</th>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>8</td>
+                    <td>4</td>
+                </tr>
+            </table>
+            Weapon
+            <select>
+                <option>Broadsword</option>
+                <option>Unarmed</option>
+            </select><br />
+            <span class="status_menu_button">[-] Armor</span>
+            <ul>
+                <li>Chain Mail</li>
+            </ul>
+            <span class="status_menu_button">[-] Inventory</span>
+            <ul>
+                <li>226 gold coins</li>
+                <li>2 Potions of Healing</li>
+            </ul>
+        </div>
+        <div class="hero">
+            Krelnik<br />
+            Dwarf<br />
+            <table>
+                <tr>
+                    <th>Attack</th>
+                    <th>Defend</th>
+                    <th>Body</th>
+                    <th>Mind</th>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>7</td>
+                    <td>3</td>
+                </tr>
+            </table>
+            Weapon
+            <select>
+                <option>Shortsword</option>
+                <option>Unarmed</option>
+            </select><br />
+            <span class="status_menu_button">[-] Armor</span>
+            <ul>
+                <li>Helmet</li>
+            </ul>
+            <span class="status_menu_button">[-] Inventory</span>
+            <ul>
+                <li>226 gold coins</li>
+                <li>2 Potions of Healing</li>
+            </ul>
+        </div>
+
+        <div class="hero">
+            Laneloth<br />
+            Elf<br />
+            <table>
+                <tr>
+                    <th>Attack</th>
+                    <th>Defend</th>
+                    <th>Body</th>
+                    <th>Mind</th>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>4</td>
+                    <td>6</td>
+                    <td>4</td>
+                </tr>
+            </table>
+            Weapon
+            <select>
+                <option>Shortsword</option>
+                <option>Unarmed</option>
+            </select><br />
+            <span class="status_menu_button">[-] Armor</span>
+            <ul>
+                <li>Helmet</li>
+                <li>Chain Mail</li>
+            </ul>
+            <span class="status_menu_button">[-] Spells</span>
+            <ul>
+                <li>Courage (Fire)</li>
+                <li>Fire of Wrath (Fire)</li>
+                <li>Ball of Flame (Fire)</li>
+            </ul>
+            <span class="status_menu_button">[-] Inventory</span>
+            <ul>
+                <li>226 gold coins</li>
+                <li>2 Potions of Healing (Use)</li>
+            </ul>
+        </div>
+        <div class="hero">
+            <img class='hero_portrait' src='hero_pic.jpg' />
+            Gheadric<br />
+            Wizard<br />
+            <table>
+                <tr>
+                    <th>Attack</th>
+                    <th>Defend</th>
+                    <th>Body</th>
+                    <th>Mind</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>4</td>
+                    <td>6</td>
+                </tr>
+            </table>
+            Weapon
+            <select>
+                <option>(2) Dagger</option>
+                <option>Unarmed</option>
+            </select><br />
+            <span class="status_menu_button">[-] Armor</span>
+            <ul>
+                <li>None</li>
+            </ul>
+            <span class="status_menu_button">[-] Spells</span>
+            <ul>
+                <li>Genie (Air)</li>
+                <li>Tempest (Air)</li>
+                <li>Swift Wind (Air)</li>
+                <li>Water of Healing (W)</li>
+                <li>Sleep (Water)</li>
+                <li>Veil of Mist (Water)</li>
+                <li>Pass Through Rock (E)</li>
+                <li>Heal Body (Earth)</li>
+                <li>Rock Skin (Earth)</li>
+            </ul>
+            <span class="status_menu_button">[-] Inventory</span>
+            <ul>
+                <li>226 gold coins</li>
+                <li>2 Potions of Healing</li>
+            </ul>
+        </div>
+
+    </body>
+</html>
