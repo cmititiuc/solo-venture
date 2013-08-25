@@ -1,0 +1,145 @@
+<svg id="canvas" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+<script type="text/javascript">
+//<![CDATA[
+function over(event) {
+    var shape = event.target;
+    var group = shape.parentNode;
+    var children = group.childNodes;
+    for (var c = 0; c < children.length; c++) {
+        if (children[c].getAttribute("class") == "walkway") {
+            children[c].setAttribute("stroke", "red");
+        }
+    }
+}
+function out(event) {
+    var shape = event.target;
+    var group = shape.parentNode;
+    var children = group.childNodes;
+    for (var c = 0; c < children.length; c++) {
+        if (children[c].getAttribute("class") == "walkway") {
+            children[c].setAttribute("stroke", "black");
+        }
+    }
+}
+function click(event) {
+    var shape = event.target;
+    var group = shape.parentNode;
+    var harold = document.getElementById("harold");
+    harold.parentNode.removeChild(harold);
+    group.appendChild(harold);
+}
+function startCanvas() {
+try {
+    var xmlns = "http://www.w3.org/2000/svg";
+    var canvas = document.getElementById('canvas');
+    var shape;
+
+    var defs = document.createElementNS(xmlns, "defs");
+
+    var pattern = document.createElementNS(xmlns, "pattern");
+    pattern.setAttribute("x", 0);
+    pattern.setAttribute("y", 0);
+    pattern.setAttribute("width", 98);
+    pattern.setAttribute("height", 98);
+    pattern.setAttribute("id", "walkway");
+    pattern.setAttribute("patternUnits", "userSpaceOnUse");
+
+    var image = document.createElementNS(xmlns, "image");
+    image.setAttribute("x", 0);
+    image.setAttribute("y", 0);
+    image.setAttribute("width", 98);
+    image.setAttribute("height", 98);
+    image.setAttribute("xlink:href", "file:///home/seed/tmp/canvas/wall.png");
+    pattern.appendChild(image);
+    defs.appendChild(pattern);
+    canvas.appendChild(defs);
+
+    var group;
+
+    group = document.createElementNS(xmlns, "g");
+    group.setAttribute("id", "0,0");
+    group.setAttribute("transform", "translate(1, 1)");
+    group.onmouseover = over;
+    group.onmouseout = out;
+    group.onclick = click;
+    canvas.appendChild(group);
+    
+    shape = document.createElementNS(xmlns, "rect");
+    shape.setAttribute("x", 0);
+    shape.setAttribute("y", 0);
+    shape.setAttribute("width", 98);
+    shape.setAttribute("height", 98);
+    shape.setAttribute("fill", "white");
+    shape.setAttribute("stroke", "black");
+    shape.setAttribute("stroke-width", 2);
+    shape.setAttribute("stroke-linejoin", "square");
+    shape.setAttribute("stroke-linecap", "butt");
+    shape.setAttribute("stroke-miterlimit", 4);
+    shape.setAttribute("id", "hello");
+    shape.setAttribute("class", "walkway");
+    group.appendChild(shape);
+
+    circle = document.createElementNS(xmlns, "circle");
+    circle.setAttribute("cx", 49);
+    circle.setAttribute("cy", 49);
+    circle.setAttribute("r",  45);
+    circle.setAttribute("fill", "green");
+    circle.setAttribute("id", "harold");
+    group.appendChild(circle);
+
+    group = document.createElementNS(xmlns, "g");
+    group.setAttribute("id", "1,0");
+    group.setAttribute("transform", "translate(101, 1)");
+    group.onmouseover = over;
+    group.onmouseout = out;
+    group.onclick = click;
+    canvas.appendChild(group);
+
+    shape = document.createElementNS(xmlns, "rect");
+    shape.setAttribute("x", 0);
+    shape.setAttribute("y", 0);
+    shape.setAttribute("width", 98);
+    shape.setAttribute("height", 98);
+    shape.setAttribute("fill", "white");
+    shape.setAttribute("stroke", "black");
+    shape.setAttribute("stroke-width", 2);
+    shape.setAttribute("stroke-linejoin", "square");
+    shape.setAttribute("stroke-linecap", "butt");
+    shape.setAttribute("stroke-miterlimit", 4);
+    shape.setAttribute("class", "walkway");
+    group.appendChild(shape);
+
+    group = document.createElementNS(xmlns, "g");
+    group.setAttribute("id", "2,0");
+    group.setAttribute("transform", "translate(201, 1)");
+    group.onmouseover = over;
+    group.onmouseout = out;
+    group.onclick = click;
+    canvas.appendChild(group);
+
+    shape = document.createElementNS(xmlns, "rect");
+    shape.setAttribute("x", 0);
+    shape.setAttribute("y", 0);
+    shape.setAttribute("width", 98);
+    shape.setAttribute("height", 98);
+    shape.setAttribute("fill", "url(#walkway)");
+    shape.setAttribute("stroke", "black");
+    shape.setAttribute("stroke-width", 2);
+    shape.setAttribute("stroke-linejoin", "square");
+    shape.setAttribute("stroke-linecap", "butt");
+    shape.setAttribute("stroke-miterlimit", 4);
+    shape.setAttribute("class", "walkway");
+    group.appendChild(shape);
+    return false;
+} catch (err) {
+  alert(err);
+}
+}
+
+startCanvas();
+//]]>
+</script>
+
+
+</svg>
