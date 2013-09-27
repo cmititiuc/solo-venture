@@ -50,13 +50,15 @@ try {
     image.setAttribute("y", 0);
     image.setAttribute("width", 98);
     image.setAttribute("height", 98);
-    image.setAttribute("xlink:href", "file:///home/seed/tmp/canvas/wall.png");
+    //image.setAttribute("xlink:href", "file:///home/seed/tmp/canvas/wall.png");
+    image.setAttribute("xlink:href", "file:///home/u/Work/solo-venture/wall.png");
     pattern.appendChild(image);
     defs.appendChild(pattern);
     canvas.appendChild(defs);
 
     var group;
 
+    /* Adds a group to the canvas. */
     group = document.createElementNS(xmlns, "g");
     group.setAttribute("id", "0,0");
     group.setAttribute("transform", "translate(1, 1)");
@@ -65,6 +67,7 @@ try {
     group.onclick = click;
     canvas.appendChild(group);
     
+    /* Adds the first square the group. */
     shape = document.createElementNS(xmlns, "rect");
     shape.setAttribute("x", 0);
     shape.setAttribute("y", 0);
@@ -80,6 +83,7 @@ try {
     shape.setAttribute("class", "walkway");
     group.appendChild(shape);
 
+    /* Adds the circle to the group. */
     circle = document.createElementNS(xmlns, "circle");
     circle.setAttribute("cx", 49);
     circle.setAttribute("cy", 49);
@@ -88,6 +92,7 @@ try {
     circle.setAttribute("id", "harold");
     group.appendChild(circle);
 
+    /* Adds another group to the canvas. */
     group = document.createElementNS(xmlns, "g");
     group.setAttribute("id", "1,0");
     group.setAttribute("transform", "translate(101, 1)");
@@ -96,6 +101,7 @@ try {
     group.onclick = click;
     canvas.appendChild(group);
 
+    /* Adds the second square to the group. */
     shape = document.createElementNS(xmlns, "rect");
     shape.setAttribute("x", 0);
     shape.setAttribute("y", 0);
@@ -110,6 +116,7 @@ try {
     shape.setAttribute("class", "walkway");
     group.appendChild(shape);
 
+    /* Adds yet another group to the canvas. */
     group = document.createElementNS(xmlns, "g");
     group.setAttribute("id", "2,0");
     group.setAttribute("transform", "translate(201, 1)");
@@ -118,6 +125,7 @@ try {
     group.onclick = click;
     canvas.appendChild(group);
 
+    /* Adds the third square to the group. */
     shape = document.createElementNS(xmlns, "rect");
     shape.setAttribute("x", 0);
     shape.setAttribute("y", 0);
@@ -140,6 +148,5 @@ try {
 startCanvas();
 //]]>
 </script>
-
 
 </svg>
