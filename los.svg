@@ -6,6 +6,7 @@ function startCanvas() {
 try {
     var xmlns = "http://www.w3.org/2000/svg";
     var canvas = document.getElementById('canvas');
+    canvas.style.background = "white";
 
     /* Sight line */
     line = document.createElementNS(xmlns, "line");
@@ -96,6 +97,5 @@ try {
 startCanvas();
 //]]>
 </script>
-
 
 </svg>
