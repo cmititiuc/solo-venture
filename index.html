@@ -26,6 +26,11 @@
       stroke: #ff0000;
       fill: #ffcccc;
     }
+    circle:hover {
+      stroke: #000099;
+      fill-opacity: 1;
+      fill: #CCCCFF;
+    }
   </style>
   <script>
     var map = [
@@ -72,9 +77,31 @@
 
     }
 
+    function makeUnit(x, y) {
+      var svgns = "http://www.w3.org/2000/svg";
+      var svgDocument = document.getElementById('viewport').ownerDocument;
+      var targetTile = document.getElementById('tile-' + x + '-' + y);
+      var cx = targetTile.x.baseVal.value;
+      var cy = targetTile.y.baseVal.value;
+
+      var shape = svgDocument.createElementNS(svgns, "circle");
+      shape.setAttributeNS(null, "cx", cx + tileWidth / 2);
+      shape.setAttributeNS(null, "cy", cy + tileHeight / 2);
+      shape.setAttributeNS(null, "r", "10");
+      shape.setAttributeNS(null, "fill-opacity", "1");
+      shape.setAttributeNS(null, "fill", '#c66666');
+      shape.setAttributeNS(null, "stroke-width", "2");
+      shape.setAttributeNS(null, "stroke", "maroon");
+      // shape.setAttributeNS(null, "class", "");
+      // shape.setAttributeNS(null, "id", "");
+
+      document.getElementById('viewport').appendChild(shape);
+    }
+
     function init() {
       viewportWidth = document.getElementById('viewport').width.baseVal.value;
       viewportHeight = document.getElementById('viewport').height.baseVal.value;
+      
       // draw tiles
       for (var i = 0; i < map.length; i++) {
         for (var j = 0; j < map[0].length; j++) {
@@ -83,6 +110,8 @@
           }
         }
       }
+      
+      makeUnit(0, 0);
     }
   </script>
 </head>
