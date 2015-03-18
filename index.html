@@ -103,6 +103,58 @@
       unit.setAttributeNS(null, "cy", cy + tileHeight / 2);
     }
 
+    function bfs(x, y, range) {
+      var targetTile = document.getElementById('tile-' + x + '-' + y);
+      var q = [];
+      q.push([x, y, 0]);
+      targetTile.style.stroke = "green";
+      targetTile.style.fill = "#CCFFCC";
+      function step() {
+        // while (q.length !== 0) {
+        if (q.length !== 0) {
+          var v = q.shift(), id;
+          // north
+          id = 'tile-' + v[0] + '-' + (v[1] - 1);
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && v[2] < range) {
+              q.push([v[0], v[1] - 1, v[2] + 1]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+          // south
+          id = 'tile-' + v[0] + '-' + (v[1] + 1);
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && v[2] < range) {
+              q.push([v[0], v[1] + 1, v[2] + 1]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+          // east
+          id = 'tile-' + (v[0] + 1) + '-' + v[1];
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && v[2] < range) {
+              q.push([v[0] + 1, v[1], v[2] + 1]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+          // west
+          id = 'tile-' + (v[0] - 1) + '-' + v[1];
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && v[2] < range) {
+              q.push([v[0] - 1, v[1], v[2] + 1]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+        }
+        setTimeout(step, 250);
+      }
+      step();
+    }
+
     function init() {
       var viewport = document.getElementById('viewport');
       viewportWidth = viewport.width.baseVal.value;
