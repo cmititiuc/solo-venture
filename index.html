@@ -73,10 +73,6 @@
       document.getElementById('viewport').appendChild(shape);
     }
 
-    function makeRoom(x1, y1, x2, y2) {
-
-    }
-
     function makeUnit(x, y) {
       var svgns = "http://www.w3.org/2000/svg";
       var svgDocument = document.getElementById('viewport').ownerDocument;
@@ -93,14 +89,24 @@
       shape.setAttributeNS(null, "stroke-width", "2");
       shape.setAttributeNS(null, "stroke", "maroon");
       // shape.setAttributeNS(null, "class", "");
-      // shape.setAttributeNS(null, "id", "");
+      shape.setAttributeNS(null, "id", "player");
 
       document.getElementById('viewport').appendChild(shape);
     }
 
+    function moveUnit(id, x, y) {
+      var unit = document.getElementById(id);
+      var targetTile = document.getElementById('tile-' + x + '-' + y);
+      var cx = targetTile.x.baseVal.value;
+      var cy = targetTile.y.baseVal.value;
+      unit.setAttributeNS(null, "cx", cx + tileWidth / 2);
+      unit.setAttributeNS(null, "cy", cy + tileHeight / 2);
+    }
+
     function init() {
-      viewportWidth = document.getElementById('viewport').width.baseVal.value;
-      viewportHeight = document.getElementById('viewport').height.baseVal.value;
+      var viewport = document.getElementById('viewport');
+      viewportWidth = viewport.width.baseVal.value;
+      viewportHeight = viewport.height.baseVal.value;
       
       // draw tiles
       for (var i = 0; i < map.length; i++) {
@@ -111,7 +117,17 @@
         }
       }
       
+      // draw player
       makeUnit(0, 0);
+      
+      var tiles = document.getElementsByClassName('tile');
+      for (var i = 0; i < tiles.length; i++) {
+        tiles[i].addEventListener('click', function() {
+          var x = this.id.match(/[0-9]+/);
+          var y = this.id.match(/[0-9]+$/);
+          moveUnit('player', x, y);
+        }, false);
+      }
     }
   </script>
 </head>
