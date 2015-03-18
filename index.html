@@ -149,7 +149,7 @@
     }
 
     // slowed down version of bfs with range
-    function bfs_slow(x, y, range = 5) {
+    function bfsSlow(x, y, range = 5) {
       var targetTile = document.getElementById('tile-' + x + '-' + y);
       var q = [];
       q.push([x, y, 0]);
@@ -199,6 +199,73 @@
       })();
     }
 
+    function drawShortestPath(x1, y1, x2, y2) {
+      var targetTile = document.getElementById('tile-' + x1 + '-' + y1);
+      var q = [];
+      var found = false;
+      q.push([x1, y1, []]);
+      targetTile.style.stroke = "green";
+      targetTile.style.fill = "#CCFFCC";
+      (function step() {
+        if (q.length !== 0) {
+          var v = q.shift(), id;
+          if (v[0] == x2 && v[1] == y2) {
+            found = true;
+            console.log(v[2]);
+          }
+          // north
+          id = 'tile-' + v[0] + '-' + (v[1] - 1);
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && found == false) {
+              console.log(v[2]);
+              var h = [].concat(v[2])
+              h.push([ v[0], v[1] ]);
+              q.push([ v[0], v[1] - 1, h ]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+          // south
+          id = 'tile-' + v[0] + '-' + (v[1] + 1);
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && found == false) {
+              console.log(v[2]);
+              var h = [].concat(v[2])
+              h.push([ v[0], v[1] ]);
+              q.push([v[0], v[1] + 1, h ]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+          // east
+          id = 'tile-' + (v[0] + 1) + '-' + v[1];
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && found == false) {
+              console.log(v[2]);
+              var h = [].concat(v[2])
+              h.push([ v[0], v[1] ]);
+              q.push([v[0] + 1, v[1], h ]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+          // west
+          id = 'tile-' + (v[0] - 1) + '-' + v[1];
+          if (targetTile = document.getElementById(id)) {
+            if (targetTile.style.stroke !== "green" && found == false) {
+              console.log(v[2]);
+              var h = [].concat(v[2])
+              h.push([ v[0], v[1] ]);
+              q.push([v[0] - 1, v[1], h ]);
+              targetTile.style.stroke = "green";
+              targetTile.style.fill = "#CCFFCC";
+            }
+          }
+        }
+        setTimeout(step, 250);
+      })();
+    }
+
     function init() {
       var viewport = document.getElementById('viewport');
       viewportWidth = viewport.width.baseVal.value;
@@ -231,7 +298,10 @@
 <body onload="init();">
 
   <!--[if lt IE 8]>
-  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <p class="browserupgrade">
+    You are using an <strong>outdated</strong> browser. Please
+    <a href="http://browsehappy.com/">upgrade your browser</a> to improve your
+    experience.</p>
   <![endif]-->
 
   <p>Against the Chaos Hordes</p>
