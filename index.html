@@ -103,14 +103,59 @@
       unit.setAttributeNS(null, "cy", cy + tileHeight / 2);
     }
 
-    function bfs(x, y, range) {
+    // from en.wikipedia.org/wiki/Breadth-first_search#Pseudocode
+    function bfs(x, y) {
+      var targetTile = document.getElementById('tile-' + x + '-' + y);
+      var q = [];
+      q.push([x, y]);
+      targetTile.style.stroke = "green";
+      targetTile.style.fill = "#CCFFCC";
+      while(q.length !== 0) {
+        var v = q.shift();
+        targetTile = document.getElementById('tile-' + v[0] + '-' + v[1]);
+        // north
+        if (targetTile = document.getElementById('tile-' + v[0] + '-' + (v[1] - 1))) {
+          if (targetTile.style.stroke !== "green") {
+            q.push([v[0], v[1] - 1]);
+            targetTile.style.stroke = "green";
+            targetTile.style.fill = "#CCFFCC";
+          }
+        }
+        // south
+        if (targetTile = document.getElementById('tile-' + v[0] + '-' + (v[1] + 1))) {
+          if (targetTile.style.stroke !== "green") {
+            q.push([v[0], v[1] + 1]);
+            targetTile.style.stroke = "green";
+            targetTile.style.fill = "#CCFFCC";
+          }
+        }
+        // east
+        if (targetTile = document.getElementById('tile-' + (v[0] + 1) + '-' + v[1])) {
+          if (targetTile.style.stroke !== "green") {
+            q.push([v[0] + 1, v[1]]);
+            targetTile.style.stroke = "green";
+            targetTile.style.fill = "#CCFFCC";
+          }
+        }
+        // west
+        if (targetTile = document.getElementById('tile-' + (v[0] - 1) + '-' + v[1])) {
+          if (targetTile.style.stroke !== "green") {
+            q.push([v[0] - 1, v[1]]);
+            targetTile.style.stroke = "green";
+            targetTile.style.fill = "#CCFFCC";
+          }
+        }
+      }
+    }
+
+    // slowed down version of bfs with range
+    function bfs_slow(x, y, range = 5) {
       var targetTile = document.getElementById('tile-' + x + '-' + y);
       var q = [];
       q.push([x, y, 0]);
       targetTile.style.stroke = "green";
       targetTile.style.fill = "#CCFFCC";
-      function step() {
-        // while (q.length !== 0) {
+      (function step() {
         if (q.length !== 0) {
           var v = q.shift(), id;
           // north
@@ -151,8 +196,7 @@
           }
         }
         setTimeout(step, 250);
-      }
-      step();
+      })();
     }
 
     function init() {
