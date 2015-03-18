@@ -194,12 +194,14 @@
               targetTile.style.fill = "#CCFFCC";
             }
           }
+          setTimeout(step, 250);
         }
-        setTimeout(step, 250);
       })();
     }
 
     function drawShortestPath(x1, y1, x2, y2) {
+      makeUnit(x1, y1);
+      makeUnit(x2, y2);
       var targetTile = document.getElementById('tile-' + x1 + '-' + y1);
       var q = [];
       var found = false;
@@ -212,13 +214,23 @@
           if (v[0] == x2 && v[1] == y2) {
             found = true;
             console.log(v[2]);
+            for (var i = 0; i < v[2].length; i++) {
+              var id = 'tile-' + v[2][i][0] + '-' + v[2][i][1];
+              targetTile = document.getElementById(id);
+              targetTile.style.stroke = "blue";
+              targetTile.style.fill = "#CCCCFF";
+            }
+            var id = 'tile-' + x2 + '-' + y2;
+            targetTile = document.getElementById(id);
+            targetTile.style.stroke = "blue";
+            targetTile.style.fill = "#CCCCFF";
           }
           // north
           id = 'tile-' + v[0] + '-' + (v[1] - 1);
           if (targetTile = document.getElementById(id)) {
             if (targetTile.style.stroke !== "green" && found == false) {
               console.log(v[2]);
-              var h = [].concat(v[2])
+              var h = [].concat(v[2]);
               h.push([ v[0], v[1] ]);
               q.push([ v[0], v[1] - 1, h ]);
               targetTile.style.stroke = "green";
@@ -230,7 +242,7 @@
           if (targetTile = document.getElementById(id)) {
             if (targetTile.style.stroke !== "green" && found == false) {
               console.log(v[2]);
-              var h = [].concat(v[2])
+              var h = [].concat(v[2]);
               h.push([ v[0], v[1] ]);
               q.push([v[0], v[1] + 1, h ]);
               targetTile.style.stroke = "green";
@@ -242,7 +254,7 @@
           if (targetTile = document.getElementById(id)) {
             if (targetTile.style.stroke !== "green" && found == false) {
               console.log(v[2]);
-              var h = [].concat(v[2])
+              var h = [].concat(v[2]);
               h.push([ v[0], v[1] ]);
               q.push([v[0] + 1, v[1], h ]);
               targetTile.style.stroke = "green";
@@ -254,15 +266,15 @@
           if (targetTile = document.getElementById(id)) {
             if (targetTile.style.stroke !== "green" && found == false) {
               console.log(v[2]);
-              var h = [].concat(v[2])
+              var h = [].concat(v[2]);
               h.push([ v[0], v[1] ]);
               q.push([v[0] - 1, v[1], h ]);
               targetTile.style.stroke = "green";
               targetTile.style.fill = "#CCFFCC";
             }
           }
+          setTimeout(step, 250);
         }
-        setTimeout(step, 250);
       })();
     }
 
