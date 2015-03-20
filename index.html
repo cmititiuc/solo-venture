@@ -173,8 +173,22 @@
     }
 
     // do these two tiles have a door between them?
-    function hasDoorBetween(x1, y1, x2, y2) {
-      return document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+
+    function closedDoorBetween(x1, y1, x2, y2) {
+      if (x1 == x2) {
+        var temp = Math.min(y1, y2);
+        var y2 = Math.max(y1, y2);
+        y1 = temp;
+      } else {
+        var temp = Math.min(x1, x2);
+        var x2 = Math.max(x1, x2);
+        x1 = temp;
+      }
+      var door = document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+      if (door && door.getAttribute('data-state') == 'closed')
+        return true;
+      else
+        return false;
     }
 
     function openDoorBetween(x1, y1, x2, y2) {
@@ -340,7 +354,7 @@
           id = 'tile-' + v[0] + '-' + (v[1] - 1);
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0], v[1] - 1)) {
+            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0], v[1] - 1)) || openDoorBetween(v[0], v[1], v[0], v[1] - 1)) {
               find(v[0], v[1] - 1);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -355,7 +369,7 @@
           id = 'tile-' + v[0] + '-' + (v[1] + 1);
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0], v[1] + 1)) {
+            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0], v[1] + 1)) || openDoorBetween(v[0], v[1], v[0], v[1] + 1)) {
               find(v[0], v[1] + 1);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -370,7 +384,7 @@
           id = 'tile-' + (v[0] + 1) + '-' + v[1];
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0] + 1, v[1])) {
+            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0] + 1, v[1])) || openDoorBetween(v[0], v[1], v[0] + 1, v[1])) {
               find(v[0] + 1, v[1]);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -385,7 +399,7 @@
           id = 'tile-' + (v[0] - 1) + '-' + v[1];
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0] - 1, v[1])) {
+            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0] - 1, v[1])) || openDoorBetween(v[0], v[1], v[0] - 1, v[1])) {
               find(v[0] - 1, v[1]);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -426,6 +440,8 @@
       makeDoor(7, 15, 7, 16, 'open');
       makeDoor(6, 13, 6, 12);
       makeDoor(8, 14, 7, 14);
+      makeDoor(8, 16, 9, 16);
+
 
       // drawShortestPath(0, 15, 1, 13);
       drawShortestPath(6, 14, 16, 4);
