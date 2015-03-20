@@ -61,15 +61,23 @@
     var viewportWidth, viewportHeight;
     var tileWidth = 30, tileHeight = 30;
 
+    function coord(axis, value) {
+      if (axis == "x") {
+        return (viewportWidth / 2 - tileWidth * (map[0].length / 2) + (tileWidth + 1) * value);
+      } else if (axis == "y") {
+        return (viewportHeight / 2 - tileHeight * (map.length / 2) + (tileHeight + 1) * value);
+      } else {
+        console.log("Axis " + axis + "not recognized.");
+      }
+    }
+
     function makeRectangle(x, y) {
       var svgns = "http://www.w3.org/2000/svg";
       var svgDocument = document.getElementById('viewport').ownerDocument;
 
       var shape = svgDocument.createElementNS(svgns, "rect");
-      shape.setAttributeNS(null, "x",
-        viewportWidth / 2 - tileWidth * (map[0].length / 2) + tileWidth * x);
-      shape.setAttributeNS(null, "y",
-        viewportHeight / 2 - tileHeight * (map.length / 2) + tileHeight * y);
+      shape.setAttributeNS(null, "x", coord('x', x));
+      shape.setAttributeNS(null, "y", coord('y', y));
       shape.setAttributeNS(null, "width",  tileWidth);
       shape.setAttributeNS(null, "height", tileHeight);
       shape.setAttributeNS(null, "class", "tile");
@@ -83,20 +91,14 @@
       var svgDocument = document.getElementById('viewport').ownerDocument;
 
       var shape = svgDocument.createElementNS(svgns, "rect");
-      shape.setAttributeNS(null, "x",
-        viewportWidth / 2 - tileWidth * (map[0].length / 2)
-          + tileWidth * Math.min(x1, x2)
-      );
-      shape.setAttributeNS(null, "y",
-        viewportHeight / 2 - tileHeight * (map.length / 2)
-          + tileHeight * Math.min(y1, y2)
-      );
+      shape.setAttributeNS(null, "x", coord('x', Math.min(x1, x2)));
+      shape.setAttributeNS(null, "y", coord('y', Math.min(y1, y2)));
       shape.setAttributeNS(null, "width",
-        (Math.abs(x1 - x2) + 1) * tileWidth);
+        (Math.abs(x1 - x2) + 1) * (tileWidth + 1) - 1);
       shape.setAttributeNS(null, "height",
-        (Math.abs(y1 - y2) + 1) * tileHeight);
+        (Math.abs(y1 - y2) + 1) * (tileHeight + 1) - 1);
       shape.setAttributeNS(null, "class", "room");
-      shape.setAttributeNS(null, "id", "room-2");
+      // shape.setAttributeNS(null, "id", "");
       
       document.getElementById('viewport').appendChild(shape);
       // set data-room attributes for all tiles in the room
