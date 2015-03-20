@@ -102,7 +102,7 @@
       
       document.getElementById('viewport').appendChild(shape);
       // set data-room attributes for all tiles in the room
-      var id = Date.now();
+      var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
       for (var i = Math.min(x1, x2); i <= Math.max(x1, x2); i++) {
         for (var j = Math.min(y1, y2); j <= Math.max(y1, y2); j++) {
           document.getElementById('tile-' + i + '-' + j).setAttribute('data-room', id);
@@ -136,7 +136,6 @@
       var svgDocument = document.getElementById('viewport').ownerDocument;
       var orientation = 'horizontal';
       if (y1 == y2) orientation = 'vertical';
-      console.log(orientation);
 
       var shape = svgDocument.createElementNS(svgns, "line");
       if (orientation == 'horizontal') {
@@ -403,7 +402,8 @@
       makeDoor(0, 14, 1, 14, 'open');
       makeDoor(4, 14, 5, 14);
       makeDoor(7, 15, 7, 16);
-      drawShortestPath(0, 15, 1, 13);
+      // drawShortestPath(0, 15, 1, 13);
+      drawShortestPath(0, 16, 16, 4);
 
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
