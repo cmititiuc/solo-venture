@@ -22,7 +22,7 @@
       stroke-dashoffset: 0;
       display: inline;
     }
-    .tile:hover {
+    .tile:hover, .probed:hover, .path:hover {
       stroke: #ff0000;
       fill: #ffcccc;
     }
@@ -30,6 +30,14 @@
       fill: none;
       stroke: black;
       stroke-width: 2;
+    }
+    .probed {
+      fill: #FFFFCC;
+      stroke: gold;
+    }
+    .path {
+      fill: #EEEEFF;
+      stroke: #9999FF;
     }
     circle:hover {
       stroke: #000099;
@@ -63,9 +71,11 @@
 
     function coord(axis, value) {
       if (axis == "x") {
-        return (viewportWidth / 2 - tileWidth * (map[0].length / 2) + (tileWidth + 1) * value);
+        return (viewportWidth / 2 - tileWidth * (map[0].length / 2)
+          + (tileWidth + 1) * value);
       } else if (axis == "y") {
-        return (viewportHeight / 2 - tileHeight * (map.length / 2) + (tileHeight + 1) * value);
+        return (viewportHeight / 2 - tileHeight * (map.length / 2)
+          + (tileHeight + 1) * value);
       } else {
         console.log("Axis " + axis + "not recognized.");
       }
@@ -105,7 +115,8 @@
       var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
       for (var i = Math.min(x1, x2); i <= Math.max(x1, x2); i++) {
         for (var j = Math.min(y1, y2); j <= Math.max(y1, y2); j++) {
-          document.getElementById('tile-' + i + '-' + j).setAttribute('data-room', id);
+          var target = document.getElementById('tile-' + i + '-' + j);
+          target.setAttribute('data-room', id);
         }
       }
     }
@@ -113,9 +124,9 @@
     function makeUnit(x, y) {
       var svgns = "http://www.w3.org/2000/svg";
       var svgDocument = document.getElementById('viewport').ownerDocument;
-      var targetTile = document.getElementById('tile-' + x + '-' + y);
-      var cx = targetTile.x.baseVal.value;
-      var cy = targetTile.y.baseVal.value;
+      var target = document.getElementById('tile-' + x + '-' + y);
+      var cx = target.x.baseVal.value;
+      var cy = target.y.baseVal.value;
 
       var shape = svgDocument.createElementNS(svgns, "circle");
       shape.setAttributeNS(null, "cx", cx + tileWidth / 2);
@@ -163,7 +174,8 @@
       shape.setAttributeNS(null, "stroke-width", "4");
       shape.setAttributeNS(null, "data-state", state);
       shape.setAttributeNS(null, "class", "door");
-      shape.setAttributeNS(null, "id", "door-" + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+      var id = "door-" + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+      shape.setAttributeNS(null, "id", id);
       if (state == 'open')
         shape.setAttributeNS(null, "stroke", "green");
       else
@@ -171,8 +183,6 @@
 
       document.getElementById('viewport').appendChild(shape);
     }
-
-    // do these two tiles have a door between them?
 
     function closedDoorBetween(x1, y1, x2, y2) {
       if (x1 == x2) {
@@ -184,7 +194,8 @@
         var x2 = Math.max(x1, x2);
         x1 = temp;
       }
-      var door = document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+      var id = 'door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+      var door = document.getElementById(id);
       if (door && door.getAttribute('data-state') == 'closed')
         return true;
       else
@@ -201,7 +212,8 @@
         var x2 = Math.max(x1, x2);
         x1 = temp;
       }
-      var door = document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+      var id = 'door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+      var door = document.getElementById(id);
       if (door && door.getAttribute('data-state') == 'open')
         return true;
       else
@@ -210,57 +222,57 @@
 
     function moveUnit(id, x, y) {
       var unit = document.getElementById(id);
-      var targetTile = document.getElementById('tile-' + x + '-' + y);
-      var cx = targetTile.x.baseVal.value;
-      var cy = targetTile.y.baseVal.value;
+      var target = document.getElementById('tile-' + x + '-' + y);
+      var cx = target.x.baseVal.value;
+      var cy = target.y.baseVal.value;
       unit.setAttributeNS(null, "cx", cx + tileWidth / 2);
       unit.setAttributeNS(null, "cy", cy + tileHeight / 2);
     }
 
     // from en.wikipedia.org/wiki/Breadth-first_search#Pseudocode
     function bfs(x, y) {
-      var targetTile = document.getElementById('tile-' + x + '-' + y);
+      var target = document.getElementById('tile-' + x + '-' + y);
       var q = [], id;
       q.push([x, y]);
-      targetTile.style.stroke = "green";
-      targetTile.style.fill = "#CCFFCC";
+      target.style.stroke = "green";
+      target.style.fill = "#CCFFCC";
       while(q.length !== 0) {
         var v = q.shift();
-        targetTile = document.getElementById('tile-' + v[0] + '-' + v[1]);
+        target = document.getElementById('tile-' + v[0] + '-' + v[1]);
         // north
         id = 'tile-' + v[0] + '-' + (v[1] - 1);
-        if (targetTile = document.getElementById(id)) {
-          if (targetTile.style.stroke !== "green") {
+        if (target = document.getElementById(id)) {
+          if (target.style.stroke !== "green") {
             q.push([v[0], v[1] - 1]);
-            targetTile.style.stroke = "green";
-            targetTile.style.fill = "#CCFFCC";
+            target.style.stroke = "green";
+            target.style.fill = "#CCFFCC";
           }
         }
         // south
         id = 'tile-' + v[0] + '-' + (v[1] + 1);
-        if (targetTile = document.getElementById(id)) {
-          if (targetTile.style.stroke !== "green") {
+        if (target = document.getElementById(id)) {
+          if (target.style.stroke !== "green") {
             q.push([v[0], v[1] + 1]);
-            targetTile.style.stroke = "green";
-            targetTile.style.fill = "#CCFFCC";
+            target.style.stroke = "green";
+            target.style.fill = "#CCFFCC";
           }
         }
         // east
         id = 'tile-' + (v[0] + 1) + '-' + v[1];
-        if (targetTile = document.getElementById(id)) {
-          if (targetTile.style.stroke !== "green") {
+        if (target = document.getElementById(id)) {
+          if (target.style.stroke !== "green") {
             q.push([v[0] + 1, v[1]]);
-            targetTile.style.stroke = "green";
-            targetTile.style.fill = "#CCFFCC";
+            target.style.stroke = "green";
+            target.style.fill = "#CCFFCC";
           }
         }
         // west
         id = 'tile-' + (v[0] - 1) + '-' + v[1];
-        if (targetTile = document.getElementById(id)) {
-          if (targetTile.style.stroke !== "green") {
+        if (target = document.getElementById(id)) {
+          if (target.style.stroke !== "green") {
             q.push([v[0] - 1, v[1]]);
-            targetTile.style.stroke = "green";
-            targetTile.style.fill = "#CCFFCC";
+            target.style.stroke = "green";
+            target.style.fill = "#CCFFCC";
           }
         }
       }
@@ -268,48 +280,48 @@
 
     // slowed down version of bfs with range
     function bfsSlow(x, y, range = 5) {
-      var targetTile = document.getElementById('tile-' + x + '-' + y);
+      var target = document.getElementById('tile-' + x + '-' + y);
       var q = [];
       q.push([x, y, 0]);
-      targetTile.style.stroke = "green";
-      targetTile.style.fill = "#CCFFCC";
+      target.style.stroke = "green";
+      target.style.fill = "#CCFFCC";
       (function step() {
         if (q.length !== 0) {
           var v = q.shift(), id;
           // north
           id = 'tile-' + v[0] + '-' + (v[1] - 1);
-          if (targetTile = document.getElementById(id)) {
-            if (targetTile.style.stroke !== "green" && v[2] < range) {
+          if (target = document.getElementById(id)) {
+            if (target.style.stroke !== "green" && v[2] < range) {
               q.push([v[0], v[1] - 1, v[2] + 1]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+              target.style.stroke = "green";
+              target.style.fill = "#CCFFCC";
             }
           }
           // south
           id = 'tile-' + v[0] + '-' + (v[1] + 1);
-          if (targetTile = document.getElementById(id)) {
-            if (targetTile.style.stroke !== "green" && v[2] < range) {
+          if (target = document.getElementById(id)) {
+            if (target.style.stroke !== "green" && v[2] < range) {
               q.push([v[0], v[1] + 1, v[2] + 1]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+              target.style.stroke = "green";
+              target.style.fill = "#CCFFCC";
             }
           }
           // east
           id = 'tile-' + (v[0] + 1) + '-' + v[1];
-          if (targetTile = document.getElementById(id)) {
-            if (targetTile.style.stroke !== "green" && v[2] < range) {
+          if (target = document.getElementById(id)) {
+            if (target.style.stroke !== "green" && v[2] < range) {
               q.push([v[0] + 1, v[1], v[2] + 1]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+              target.style.stroke = "green";
+              target.style.fill = "#CCFFCC";
             }
           }
           // west
           id = 'tile-' + (v[0] - 1) + '-' + v[1];
-          if (targetTile = document.getElementById(id)) {
-            if (targetTile.style.stroke !== "green" && v[2] < range) {
+          if (target = document.getElementById(id)) {
+            if (target.style.stroke !== "green" && v[2] < range) {
               q.push([v[0] - 1, v[1], v[2] + 1]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+              target.style.stroke = "green";
+              target.style.fill = "#CCFFCC";
             }
           }
           setTimeout(step, 250);
@@ -320,96 +332,63 @@
     function drawShortestPath(x1, y1, x2, y2) {
       makeUnit(x1, y1);
       makeUnit(x2, y2);
-      var targetTile = document.getElementById('tile-' + x1 + '-' + y1);
+      var source = document.getElementById('tile-' + x1 + '-' + y1);
+      source.setAttribute('class', 'probed');
       var q = [];
       var found = false;
       q.push([x1, y1, []]);
-      targetTile.style.stroke = "green";
-      targetTile.style.fill = "#CCFFCC";
+
+      function markTile(x, y, className) {
+        var id = 'tile-' + x + '-' + y;
+        var target = document.getElementById(id);
+        target.setAttribute('class', className);
+      }
+
+      function find(x, y) {
+        if (x == x2 && y == y2) {
+          found = true;
+          q = []; // only need if running as while loop
+          for (var i = 0; i < v[2].length; i++) {
+            markTile(v[2][i][0], v[2][i][1], 'path');
+          }
+          markTile(x2, y2, 'path');
+          markTile(v[0], v[1], 'path');
+        }
+      }
+
+      function sameRoom(node, target) {
+        var node_room = node.getAttribute('data-room');
+        return node_room == target.getAttribute('data-room');
+      }
+
+      function probe(v, x, y) {
+        var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
+        var target = document.getElementById('tile-' + x + '-' + y);
+        if (target && !closedDoorBetween(v[0], v[1], x, y)) {
+          if (sameRoom(node, target) || openDoorBetween(v[0], v[1], x, y)) {
+            find(x, y);
+            if (found == false && target.getAttribute('class') !== "probed") {
+              var history = v[2].slice();
+              history.push([ v[0], v[1] ]);
+              q.push([ x, y, history ]);
+              target.setAttribute('class', 'probed');
+            }
+          }
+        }
+      }
+
       // (function step() {
         // if (q.length !== 0) {
         while (q.length !== 0) {
           var v = q.shift(), id;
-          function find(x, y) {
-            if (x == x2 && y == y2) {
-              found = true;
-              q = []; // only need if running as while loop
-              for (var i = 0; i < v[2].length; i++) {
-                var id = 'tile-' + v[2][i][0] + '-' + v[2][i][1];
-                targetTile = document.getElementById(id);
-                targetTile.style.stroke = "blue";
-                targetTile.style.fill = "#CCCCFF";
-              }
-              var id = 'tile-' + x2 + '-' + y2;
-              targetTile = document.getElementById(id);
-              targetTile.style.stroke = "blue";
-              targetTile.style.fill = "#CCCCFF";
-              var id = 'tile-' + v[0] + '-' + v[1];
-              targetTile = document.getElementById(id);
-              targetTile.style.stroke = "blue";
-              targetTile.style.fill = "#CCCCFF";
-            }
-          }
-          // north
-          id = 'tile-' + v[0] + '-' + (v[1] - 1);
-          if (targetTile = document.getElementById(id)) {
-            id = 'tile-' + v[0] + '-' + v[1];
-            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0], v[1] - 1)) || openDoorBetween(v[0], v[1], v[0], v[1] - 1)) {
-              find(v[0], v[1] - 1);
-              if (targetTile.style.stroke !== "green" && found == false) {
-                var h = [].concat(v[2]);
-                h.push([ v[0], v[1] ]);
-                q.push([ v[0], v[1] - 1, h ]);
-                targetTile.style.stroke = "green";
-                targetTile.style.fill = "#CCFFCC";
-              }
-            }
-          }
-          // south
-          id = 'tile-' + v[0] + '-' + (v[1] + 1);
-          if (targetTile = document.getElementById(id)) {
-            id = 'tile-' + v[0] + '-' + v[1];
-            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0], v[1] + 1)) || openDoorBetween(v[0], v[1], v[0], v[1] + 1)) {
-              find(v[0], v[1] + 1);
-              if (targetTile.style.stroke !== "green" && found == false) {
-                var h = [].concat(v[2]);
-                h.push([ v[0], v[1] ]);
-                q.push([v[0], v[1] + 1, h ]);
-                targetTile.style.stroke = "green";
-                targetTile.style.fill = "#CCFFCC";
-              }
-            }
-          }
-          // east
-          id = 'tile-' + (v[0] + 1) + '-' + v[1];
-          if (targetTile = document.getElementById(id)) {
-            id = 'tile-' + v[0] + '-' + v[1];
-            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0] + 1, v[1])) || openDoorBetween(v[0], v[1], v[0] + 1, v[1])) {
-              find(v[0] + 1, v[1]);
-              if (targetTile.style.stroke !== "green" && found == false) {
-                var h = [].concat(v[2]);
-                h.push([ v[0], v[1] ]);
-                q.push([v[0] + 1, v[1], h ]);
-                targetTile.style.stroke = "green";
-                targetTile.style.fill = "#CCFFCC";
-              }
-            }
-          }
-          // west
-          id = 'tile-' + (v[0] - 1) + '-' + v[1];
-          if (targetTile = document.getElementById(id)) {
-            id = 'tile-' + v[0] + '-' + v[1];
-            if ((document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') && !closedDoorBetween(v[0], v[1], v[0] - 1, v[1])) || openDoorBetween(v[0], v[1], v[0] - 1, v[1])) {
-              find(v[0] - 1, v[1]);
-              if (targetTile.style.stroke !== "green" && found == false) {
-                var h = [].concat(v[2]);
-                h.push([ v[0], v[1] ]);
-                q.push([v[0] - 1, v[1], h ]);
-                targetTile.style.stroke = "green";
-                targetTile.style.fill = "#CCFFCC";
-              }
-            }
-          }
+          var id = 'tile-' + v[0] + '-' + v[1];
+          var node = document.getElementById(id);
+
+          probe(v, v[0]    , v[1] - 1); // north
+          probe(v, v[0]    , v[1] + 1); // south
+          probe(v, v[0] + 1, v[1]    ); // east
+          probe(v, v[0] - 1, v[1]    ); // west
+
           // if (found == false) setTimeout(step, 1);
         }
       // })();
@@ -429,6 +408,16 @@
         }
       }
       
+      var tiles = document.getElementsByClassName('tile');
+      for (var i = 0; i < tiles.length; i++) {
+        tiles[i].addEventListener('click', function() {
+          var x = this.id.match(/[0-9]+/);
+          var y = this.id.match(/[0-9]+$/);
+          console.log('x: ' + x + ' y: ' + y);
+          moveUnit('player', x, y);
+        }, false);
+      }
+
       // draw player
       makeUnit(0, 0);
       // makeRoom(1, 12, 4, 15);
@@ -445,16 +434,6 @@
 
       // drawShortestPath(0, 15, 1, 13);
       drawShortestPath(6, 14, 16, 4);
-
-      var tiles = document.getElementsByClassName('tile');
-      for (var i = 0; i < tiles.length; i++) {
-        tiles[i].addEventListener('click', function() {
-          var x = this.id.match(/[0-9]+/);
-          var y = this.id.match(/[0-9]+$/);
-          console.log('x: ' + x + ' y: ' + y);
-          moveUnit('player', x, y);
-        }, false);
-      }
     }
   </script>
 </head>
