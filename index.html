@@ -131,7 +131,7 @@
       document.getElementById('viewport').appendChild(shape);
     }
 
-    function makeDoor(x1, y1, x2, y2) {
+    function makeDoor(x1, y1, x2, y2, state = 'closed') {
       var svgns = "http://www.w3.org/2000/svg";
       var svgDocument = document.getElementById('viewport').ownerDocument;
       var orientation = 'horizontal';
@@ -150,12 +150,29 @@
         shape.setAttributeNS(null, "x2", coord('x', Math.max(x1, x2)));
         shape.setAttributeNS(null, "y2", coord('y', y1) + tileHeight);
       }
-      shape.setAttributeNS(null, "stroke", "red");
       shape.setAttributeNS(null, "stroke-width", "4");
-      shape.setAttributeNS(null, "data-state", "closed");
+      shape.setAttributeNS(null, "data-state", state);
       shape.setAttributeNS(null, "class", "door");
+      shape.setAttributeNS(null, "id", "door-" + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+      if (state == 'open')
+        shape.setAttributeNS(null, "stroke", "green");
+      else
+        shape.setAttributeNS(null, "stroke", "red");
 
       document.getElementById('viewport').appendChild(shape);
+    }
+
+    // do these two tiles have a door between them?
+    function hasDoorBetween(x1, y1, x2, y2) {
+      return document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+    }
+
+    function openDoorBetween(x1, y1, x2, y2) {
+      var door = document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+      if (door && door.getAttribute('data-state') == 'open')
+        return true;
+      else
+        return false;
     }
 
     function moveUnit(id, x, y) {
@@ -304,7 +321,7 @@
           id = 'tile-' + v[0] + '-' + (v[1] - 1);
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0], v[1] - 1)) {
               find(v[0], v[1] - 1);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -319,7 +336,7 @@
           id = 'tile-' + v[0] + '-' + (v[1] + 1);
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0], v[1] + 1)) {
               find(v[0], v[1] + 1);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -334,7 +351,7 @@
           id = 'tile-' + (v[0] + 1) + '-' + v[1];
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0] + 1, v[1])) {
               find(v[0] + 1, v[1]);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -349,7 +366,7 @@
           id = 'tile-' + (v[0] - 1) + '-' + v[1];
           if (targetTile = document.getElementById(id)) {
             id = 'tile-' + v[0] + '-' + v[1];
-            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room') || openDoorBetween(v[0], v[1], v[0] - 1, v[1])) {
               find(v[0] - 1, v[1]);
               if (targetTile.style.stroke !== "green" && found == false) {
                 var h = [].concat(v[2]);
@@ -383,9 +400,10 @@
       makeUnit(0, 0);
       makeRoom(1, 12, 4, 15);
       makeRoom(8, 15, 5, 11);
-      makeDoor(0, 14, 1, 14);
+      makeDoor(0, 14, 1, 14, 'open');
       makeDoor(4, 14, 5, 14);
       makeDoor(7, 15, 7, 16);
+      drawShortestPath(0, 15, 1, 13);
 
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
