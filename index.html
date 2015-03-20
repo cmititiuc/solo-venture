@@ -132,10 +132,21 @@
     }
 
     function makeDoor(x1, y1, x2, y2, state = 'closed') {
+      // TODO: test to make sure tiles are adjacent
       var svgns = "http://www.w3.org/2000/svg";
       var svgDocument = document.getElementById('viewport').ownerDocument;
       var orientation = 'horizontal';
       if (y1 == y2) orientation = 'vertical';
+
+      if (x1 == x2) {
+        var temp = Math.min(y1, y2);
+        var y2 = Math.max(y1, y2);
+        y1 = temp;
+      } else {
+        var temp = Math.min(x1, x2);
+        var x2 = Math.max(x1, x2);
+        x1 = temp;
+      }
 
       var shape = svgDocument.createElementNS(svgns, "line");
       if (orientation == 'horizontal') {
@@ -167,6 +178,15 @@
     }
 
     function openDoorBetween(x1, y1, x2, y2) {
+      if (x1 == x2) {
+        var temp = Math.min(y1, y2);
+        var y2 = Math.max(y1, y2);
+        y1 = temp;
+      } else {
+        var temp = Math.min(x1, x2);
+        var x2 = Math.max(x1, x2);
+        x1 = temp;
+      }
       var door = document.getElementById('door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
       if (door && door.getAttribute('data-state') == 'open')
         return true;
@@ -397,13 +417,18 @@
       
       // draw player
       makeUnit(0, 0);
-      makeRoom(1, 12, 4, 15);
-      makeRoom(8, 15, 5, 11);
-      makeDoor(0, 14, 1, 14, 'open');
+      // makeRoom(1, 12, 4, 15);
+      // makeRoom(8, 15, 5, 11);
+      makeRoom(1, 13, 3, 15);
+      makeRoom(7, 15, 5, 13);
+      makeDoor(0, 14, 1, 14);
       makeDoor(4, 14, 5, 14);
-      makeDoor(7, 15, 7, 16);
+      makeDoor(7, 15, 7, 16, 'open');
+      makeDoor(6, 13, 6, 12);
+      makeDoor(8, 14, 7, 14);
+
       // drawShortestPath(0, 15, 1, 13);
-      drawShortestPath(0, 16, 16, 4);
+      drawShortestPath(6, 14, 16, 4);
 
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
