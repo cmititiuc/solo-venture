@@ -26,6 +26,11 @@
       stroke: #ff0000;
       fill: #ffcccc;
     }
+    .room {
+      fill-opacity: 0;
+      stroke: black;
+      stroke-width: 2;
+    }
     circle:hover {
       stroke: #000099;
       fill-opacity: 1;
@@ -71,6 +76,36 @@
       shape.setAttributeNS(null, "id", "tile-" + x + "-" + y);
       
       document.getElementById('viewport').appendChild(shape);
+    }
+
+    function makeRoom(x1, y1, x2, y2) {
+      var svgns = "http://www.w3.org/2000/svg";
+      var svgDocument = document.getElementById('viewport').ownerDocument;
+
+      var shape = svgDocument.createElementNS(svgns, "rect");
+      shape.setAttributeNS(null, "x",
+        viewportWidth / 2 - tileWidth * (map[0].length / 2)
+          + tileWidth * Math.min(x1, x2)
+      );
+      shape.setAttributeNS(null, "y",
+        viewportHeight / 2 - tileHeight * (map.length / 2)
+          + tileHeight * Math.min(y1, y2)
+      );
+      shape.setAttributeNS(null, "width",
+        (Math.abs(x1 - x2) + 1) * tileWidth);
+      shape.setAttributeNS(null, "height",
+        (Math.abs(y1 - y2) + 1) * tileHeight);
+      shape.setAttributeNS(null, "class", "room");
+      shape.setAttributeNS(null, "id", "room-2");
+      
+      document.getElementById('viewport').appendChild(shape);
+      // set data-room attributes for all tiles in the room
+      var id = Date.now();
+      for (var i = Math.min(x1, x2); i <= Math.max(x1, x2); i++) {
+        for (var j = Math.min(y1, y2); j <= Math.max(y1, y2); j++) {
+          document.getElementById('tile-' + i + '-' + j).setAttribute('data-room', id);
+        }
+      }
     }
 
     function makeUnit(x, y) {
@@ -239,49 +274,61 @@
           // north
           id = 'tile-' + v[0] + '-' + (v[1] - 1);
           if (targetTile = document.getElementById(id)) {
-            find(v[0], v[1] - 1);
-            if (targetTile.style.stroke !== "green" && found == false) {
-              var h = [].concat(v[2]);
-              h.push([ v[0], v[1] ]);
-              q.push([ v[0], v[1] - 1, h ]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+            id = 'tile-' + v[0] + '-' + v[1];
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+              find(v[0], v[1] - 1);
+              if (targetTile.style.stroke !== "green" && found == false) {
+                var h = [].concat(v[2]);
+                h.push([ v[0], v[1] ]);
+                q.push([ v[0], v[1] - 1, h ]);
+                targetTile.style.stroke = "green";
+                targetTile.style.fill = "#CCFFCC";
+              }
             }
           }
           // south
           id = 'tile-' + v[0] + '-' + (v[1] + 1);
           if (targetTile = document.getElementById(id)) {
-            find(v[0], v[1] + 1);
-            if (targetTile.style.stroke !== "green" && found == false) {
-              var h = [].concat(v[2]);
-              h.push([ v[0], v[1] ]);
-              q.push([v[0], v[1] + 1, h ]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+            id = 'tile-' + v[0] + '-' + v[1];
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+              find(v[0], v[1] + 1);
+              if (targetTile.style.stroke !== "green" && found == false) {
+                var h = [].concat(v[2]);
+                h.push([ v[0], v[1] ]);
+                q.push([v[0], v[1] + 1, h ]);
+                targetTile.style.stroke = "green";
+                targetTile.style.fill = "#CCFFCC";
+              }
             }
           }
           // east
           id = 'tile-' + (v[0] + 1) + '-' + v[1];
           if (targetTile = document.getElementById(id)) {
-            find(v[0] + 1, v[1]);
-            if (targetTile.style.stroke !== "green" && found == false) {
-              var h = [].concat(v[2]);
-              h.push([ v[0], v[1] ]);
-              q.push([v[0] + 1, v[1], h ]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+            id = 'tile-' + v[0] + '-' + v[1];
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+              find(v[0] + 1, v[1]);
+              if (targetTile.style.stroke !== "green" && found == false) {
+                var h = [].concat(v[2]);
+                h.push([ v[0], v[1] ]);
+                q.push([v[0] + 1, v[1], h ]);
+                targetTile.style.stroke = "green";
+                targetTile.style.fill = "#CCFFCC";
+              }
             }
           }
           // west
           id = 'tile-' + (v[0] - 1) + '-' + v[1];
           if (targetTile = document.getElementById(id)) {
-            find(v[0] - 1, v[1]);
-            if (targetTile.style.stroke !== "green" && found == false) {
-              var h = [].concat(v[2]);
-              h.push([ v[0], v[1] ]);
-              q.push([v[0] - 1, v[1], h ]);
-              targetTile.style.stroke = "green";
-              targetTile.style.fill = "#CCFFCC";
+            id = 'tile-' + v[0] + '-' + v[1];
+            if (document.getElementById(id).getAttribute('data-room') == targetTile.getAttribute('data-room')) {
+              find(v[0] - 1, v[1]);
+              if (targetTile.style.stroke !== "green" && found == false) {
+                var h = [].concat(v[2]);
+                h.push([ v[0], v[1] ]);
+                q.push([v[0] - 1, v[1], h ]);
+                targetTile.style.stroke = "green";
+                targetTile.style.fill = "#CCFFCC";
+              }
             }
           }
           // if (found == false) setTimeout(step, 1);
@@ -305,7 +352,9 @@
       
       // draw player
       makeUnit(0, 0);
-      
+      makeRoom(1, 12, 4, 15);
+      makeRoom(8, 15, 5, 11);
+
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
         tiles[i].addEventListener('click', function() {
