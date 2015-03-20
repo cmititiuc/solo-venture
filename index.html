@@ -139,12 +139,21 @@
       console.log(orientation);
 
       var shape = svgDocument.createElementNS(svgns, "line");
-      shape.setAttributeNS(null, "x1", coord('x', x1));
-      shape.setAttributeNS(null, "y1", coord('y', y1));
-      shape.setAttributeNS(null, "x2", coord('x', x2));
-      shape.setAttributeNS(null, "y2", coord('y', y2));
+      if (orientation == 'horizontal') {
+        shape.setAttributeNS(null, "x1", coord('x', x1));
+        shape.setAttributeNS(null, "y1", coord('y', Math.max(y1, y2)));
+        shape.setAttributeNS(null, "x2", coord('x', x1) + tileWidth);
+        shape.setAttributeNS(null, "y2", coord('y', Math.max(y1, y2)));
+      } else {
+        shape.setAttributeNS(null, "x1", coord('x', Math.max(x1, x2)));
+        shape.setAttributeNS(null, "y1", coord('y', y1));
+        shape.setAttributeNS(null, "x2", coord('x', Math.max(x1, x2)));
+        shape.setAttributeNS(null, "y2", coord('y', y1) + tileHeight);
+      }
       shape.setAttributeNS(null, "stroke", "red");
-      shape.setAttributeNS(null, "stroke-width", "2");
+      shape.setAttributeNS(null, "stroke-width", "4");
+      shape.setAttributeNS(null, "data-state", "closed");
+      shape.setAttributeNS(null, "class", "door");
 
       document.getElementById('viewport').appendChild(shape);
     }
@@ -374,7 +383,9 @@
       makeUnit(0, 0);
       makeRoom(1, 12, 4, 15);
       makeRoom(8, 15, 5, 11);
-      // makeDoor(1, 15, 1, 14);
+      makeDoor(0, 14, 1, 14);
+      makeDoor(4, 14, 5, 14);
+      makeDoor(7, 15, 7, 16);
 
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
