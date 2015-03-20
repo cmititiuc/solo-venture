@@ -131,6 +131,24 @@
       document.getElementById('viewport').appendChild(shape);
     }
 
+    function makeDoor(x1, y1, x2, y2) {
+      var svgns = "http://www.w3.org/2000/svg";
+      var svgDocument = document.getElementById('viewport').ownerDocument;
+      var orientation = 'horizontal';
+      if (y1 == y2) orientation = 'vertical';
+      console.log(orientation);
+
+      var shape = svgDocument.createElementNS(svgns, "line");
+      shape.setAttributeNS(null, "x1", coord('x', x1));
+      shape.setAttributeNS(null, "y1", coord('y', y1));
+      shape.setAttributeNS(null, "x2", coord('x', x2));
+      shape.setAttributeNS(null, "y2", coord('y', y2));
+      shape.setAttributeNS(null, "stroke", "red");
+      shape.setAttributeNS(null, "stroke-width", "2");
+
+      document.getElementById('viewport').appendChild(shape);
+    }
+
     function moveUnit(id, x, y) {
       var unit = document.getElementById(id);
       var targetTile = document.getElementById('tile-' + x + '-' + y);
@@ -356,12 +374,14 @@
       makeUnit(0, 0);
       makeRoom(1, 12, 4, 15);
       makeRoom(8, 15, 5, 11);
+      // makeDoor(1, 15, 1, 14);
 
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
         tiles[i].addEventListener('click', function() {
           var x = this.id.match(/[0-9]+/);
           var y = this.id.match(/[0-9]+$/);
+          console.log('x: ' + x + ' y: ' + y);
           moveUnit('player', x, y);
         }, false);
       }
