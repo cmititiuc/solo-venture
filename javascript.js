@@ -174,6 +174,38 @@ function moveUnit(id, x, y) {
   unit.setAttributeNS(null, "data-y", y);
 }
 
+function makeFurniture(x1, y1, x2, y2) {
+  var svgns = "http://www.w3.org/2000/svg";
+  var svgDocument = document.getElementById('viewport').ownerDocument;
+
+  if (x1 == x2) {
+    var temp = Math.min(y1, y2);
+    var y2 = Math.max(y1, y2);
+    y1 = temp;
+  } else {
+    var temp = Math.min(x1, x2);
+    var x2 = Math.max(x1, x2);
+    x1 = temp;
+  }
+
+  var shape = svgDocument.createElementNS(svgns, "rect");
+  shape.setAttributeNS(null, "x", coord('x', x1) + tileWidth * .10);
+  shape.setAttributeNS(null, "y", coord('y', y1) + tileHeight * .10);
+  shape.setAttributeNS(null, "width",  tileWidth * (Math.abs(x1 - x2) + 1) - tileWidth * .20);
+  shape.setAttributeNS(null, "height", tileHeight * (Math.abs(y1 - y2) + 1) - tileHeight * .20);
+  shape.setAttributeNS(null, "class", "furniture");
+  // shape.setAttributeNS(null, "id", "");
+  
+  document.getElementById('viewport').appendChild(shape);
+
+  // remove the ids so they're not used in pathfinding
+  for (var i = x1; i <= x2; i++) {
+    for (var j = y1; j <= y2; j++) {
+      document.getElementById('tile-' + i + '-' +j).setAttribute('id', '');
+    }
+  }
+}
+
 // from en.wikipedia.org/wiki/Breadth-first_search#Pseudocode
 function bfs(x, y) {
   var target = document.getElementById('tile-' + x + '-' + y);

@@ -44,3 +44,8 @@ circle:hover {
 .door:hover {
   stroke-width: 10;
 }
+
+.furniture {
+  stroke: #800000;
+  fill: #ffcbcb;
+}
