@@ -40,3 +40,7 @@ circle:hover {
   fill-opacity: 1;
   fill: #CCCCFF;
 }
+
+.door:hover {
+  stroke-width: 10;
+}

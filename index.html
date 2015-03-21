@@ -148,6 +148,18 @@
       makeDoor(8, 14, 7, 14, 'open');
       makeDoor(8, 16, 9, 16, 'open');
 
+      var doors = document.getElementsByClassName('door');
+      for (var i = 0; i < doors.length; i++) {
+        doors[i].addEventListener('click', function() {
+          if (this.getAttribute('data-state') == 'open') {
+            this.setAttribute('data-state', 'closed');
+            this.style.stroke = 'red';
+          } else {
+            this.setAttribute('data-state', 'open');
+            this.style.stroke = 'green';
+          }
+        }, false);
+      }
 
       // drawShortestPath(0, 15, 1, 13);
       drawShortestPath(6, 14, 9, 10);
