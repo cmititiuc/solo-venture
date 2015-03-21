@@ -101,11 +101,12 @@ function makeMark(x, y) {
   document.getElementById('viewport').appendChild(shape);
 }
 
-function makeDoor(x1, y1, x2, y2, state = 'closed') {
+function makeDoor(x1, y1, x2, y2, state) {
   // TODO: test to make sure tiles are adjacent
   var svgns = "http://www.w3.org/2000/svg";
   var svgDocument = document.getElementById('viewport').ownerDocument;
   var orientation = 'horizontal';
+  var state = typeof state !== 'undefined' ? state : 'closed';
   if (y1 == y2) orientation = 'vertical';
 
   if (x1 == x2) {
@@ -204,7 +205,8 @@ function bfs(x, y) {
 }
 
 // slowed down version of bfs with range
-function bfsSlow(x, y, range = 5) {
+function bfsSlow(x, y, range) {
+  var range = typeof range !== 'undefined' ? range : 5;
   var target = document.getElementById('tile-' + x + '-' + y);
   var q = [];
   q.push([x, y, 0]);
