@@ -205,7 +205,9 @@ function makeFurniture(x1, y1, x2, y2) {
   // remove the ids so they're not used in pathfinding
   for (var i = x1; i <= x2; i++) {
     for (var j = y1; j <= y2; j++) {
-      document.getElementById('tile-' + i + '-' +j).setAttribute('id', '');
+      var tile = document.getElementById('tile-' + i + '-' +j);
+      tile.setAttribute('id', '');
+      tile.removeEventListener('click', updateMap);
     }
   }
 }
@@ -331,4 +333,25 @@ function markTile(x, y, className) {
   var id = 'tile-' + x + '-' + y;
   var target = document.getElementById(id);
   target.setAttribute('class', className);
+}
+
+function updateMap() {
+  var occupied = this.getAttribute('data-occupied');
+  if (!occupied || occupied.length == 0) {
+    var x = this.id.match(/[0-9]+/);
+    var y = this.id.match(/[0-9]+$/);
+    var player = document.getElementsByClassName('player')[0];
+    var source = document.getElementById(
+      'tile-' + player.getAttribute('data-x') + '-'
+      + player.getAttribute('data-y'));
+
+    console.log('x: ' + x + ' y: ' + y);
+    player.setAttribute("transform", "translate("
+      + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
+    this.setAttribute('data-occupied', 'friendly');
+    source.setAttribute('data-occupied', '');
+    player.setAttributeNS(null, "data-x", x);
+    player.setAttributeNS(null, "data-y", y);
+    resetTiles();
+  }
 }
