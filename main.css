@@ -21,7 +21,7 @@ svg { border: 1px solid teal; }
 
 .room {
   fill: none;
-  stroke: black;
+  stroke: gray;
   stroke-width: 2;
 }
 
