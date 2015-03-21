@@ -66,28 +66,29 @@ function makeUnit(x, y) {
   shape.setAttributeNS(null, "stroke-width", "2");
   shape.setAttributeNS(null, "stroke", "maroon");
   // shape.setAttributeNS(null, "class", "");
-  shape.setAttributeNS(null, "id", "base");
-  shape.setAttributeNS(null, "data-x", x);
-  shape.setAttributeNS(null, "data-y", y);
 
   // document.getElementById('viewport').appendChild(shape);
 
-  var data = svgDocument.createTextNode("1");
+  var symbol = document.getElementsByClassName('player').length + 1;
+  var data = svgDocument.createTextNode(symbol);
 
   var text = svgDocument.createElementNS(svgns, "text");
   text.style.fontSize = "15px";
   text.style.fontWeight = "bold";
-  text.setAttributeNS(null, "x", cx + tileWidth / 2 - 1);
+  text.setAttributeNS(null, "x", cx + tileWidth / 2);
   text.setAttributeNS(null, "y", cy + tileHeight / 2 + 5);
   text.setAttributeNS(null, "fill", "#F1E9D2");
   text.setAttributeNS(null, "text-anchor", "middle");
-
   text.appendChild(data);
-  // document.getElementById('viewport').appendChild(text);
+
   var group = document.createElementNS("http://www.w3.org/2000/svg","g");
-  group.setAttribute("id", "player");
+  group.setAttribute("class", "player");
+  group.setAttribute("id", "player-" + symbol);
+  group.setAttributeNS(null, "data-x", x);
+  group.setAttributeNS(null, "data-y", y);
   group.appendChild(shape);
   group.appendChild(text);
+
   document.getElementById('viewport').appendChild(group);
 }
 

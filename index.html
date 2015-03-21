@@ -95,10 +95,10 @@
           var id = 'tile-' + v[0] + '-' + v[1];
           var node = document.getElementById(id);
 
-          probe(v, +v[0]    , +v[1] - 1); // north
-          probe(v, +v[0]    , +v[1] + 1); // south
-          probe(v, +v[0] + 1, +v[1]    ); // east
-          probe(v, +v[0] - 1, +v[1]    ); // west
+          probe(v, v[0]     , +v[1] - 1); // north
+          probe(v, v[0]     , +v[1] + 1); // south
+          probe(v, +v[0] + 1, v[1]     ); // east
+          probe(v, +v[0] - 1, v[1]     ); // west
 
           // if (found == false) setTimeout(step, 1);
         }
@@ -126,19 +126,18 @@
           var y = this.id.match(/[0-9]+$/);
           console.log('x: ' + x + ' y: ' + y);
           // moveUnit('player', x, y);
-          document.getElementById('player')
-                  .setAttribute("transform", "translate(" 
-                    + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
-          var base = document.getElementById('base');
-          base.setAttributeNS(null, "data-x", x);
-          base.setAttributeNS(null, "data-y", y);
+          var player = document.getElementsByClassName('player')[0];
+          player.setAttribute("transform", "translate("
+            + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
+          player.setAttributeNS(null, "data-x", x);
+          player.setAttributeNS(null, "data-y", y);
           resetTiles();
         }, false);
       }
 
       for (var i = 0; i < tiles.length; i++) {
         tiles[i].addEventListener('mouseover', function() {
-          var player = document.getElementById('base');
+          var player = document.getElementsByClassName('player')[0];
           var x1 = player.getAttribute('data-x');
           var y1 = player.getAttribute('data-y');
           var x2 = this.id.match(/[0-9]+/);
