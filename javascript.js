@@ -67,6 +67,8 @@ function makeUnit(x, y) {
   shape.setAttributeNS(null, "stroke", "maroon");
   // shape.setAttributeNS(null, "class", "");
   shape.setAttributeNS(null, "id", "player");
+  shape.setAttributeNS(null, "data-x", x);
+  shape.setAttributeNS(null, "data-y", y);
 
   document.getElementById('viewport').appendChild(shape);
 }
@@ -148,6 +150,8 @@ function moveUnit(id, x, y) {
   var cy = target.y.baseVal.value;
   unit.setAttributeNS(null, "cx", cx + tileWidth / 2);
   unit.setAttributeNS(null, "cy", cy + tileHeight / 2);
+  unit.setAttributeNS(null, "data-x", x);
+  unit.setAttributeNS(null, "data-y", y);
 }
 
 // from en.wikipedia.org/wiki/Breadth-first_search#Pseudocode
@@ -253,4 +257,21 @@ function bfsSlow(x, y, range = 5) {
 function sameRoom(node, target) {
   var node_room = node.getAttribute('data-room');
   return node_room == target.getAttribute('data-room');
+}
+
+function resetTiles() {
+  var path = document.getElementsByClassName('path');
+  while (path.length != 0) {
+    path[0].setAttribute('class', 'tile');
+  }
+  var probed = document.getElementsByClassName('probed');
+  while (probed.length != 0) {
+    probed[0].setAttribute('class', 'tile');
+  }
+}
+
+function markTile(x, y, className) {
+  var id = 'tile-' + x + '-' + y;
+  var target = document.getElementById(id);
+  target.setAttribute('class', className);
 }
