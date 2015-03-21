@@ -1,9 +1,34 @@
-svg { border: 1px solid teal; }
+svg {
+  border: 1px solid brown;
+  /*background-color: #eae7d8;*/
+  background-color: #fffceb;
+  margin: 0 auto;
+  width: 800px;
+  display: block;
+}
+
+body {
+  background-color: #eae2bc;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.5em;
+}
+
+h2 {
+  font-size: 1em;
+}
 
 .tile {
-  fill: #ffffff;
+  /*fill: #F6F6F6;*/
+  fill: #DfDfDf;
   fill-opacity: 1;
-  stroke: #cfcfcf;
+  stroke: #BfBfBf;
   stroke-width: 1;
   stroke-linecap: butt;
   stroke-linejoin: miter;
