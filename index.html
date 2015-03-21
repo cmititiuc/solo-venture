@@ -122,16 +122,24 @@
       var tiles = document.getElementsByClassName('tile');
       for (var i = 0; i < tiles.length; i++) {
         tiles[i].addEventListener('click', function() {
-          var x = this.id.match(/[0-9]+/);
-          var y = this.id.match(/[0-9]+$/);
-          console.log('x: ' + x + ' y: ' + y);
-          // moveUnit('player', x, y);
-          var player = document.getElementsByClassName('player')[0];
-          player.setAttribute("transform", "translate("
-            + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
-          player.setAttributeNS(null, "data-x", x);
-          player.setAttributeNS(null, "data-y", y);
-          resetTiles();
+          var occupied = this.getAttribute('data-occupied');
+          if (!occupied || occupied.length == 0) {
+            var x = this.id.match(/[0-9]+/);
+            var y = this.id.match(/[0-9]+$/);
+            var player = document.getElementsByClassName('player')[0];
+            var source = document.getElementById(
+              'tile-' + player.getAttribute('data-x') + '-'
+              + player.getAttribute('data-y'));
+
+            console.log('x: ' + x + ' y: ' + y);
+            player.setAttribute("transform", "translate("
+              + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
+            this.setAttribute('data-occupied', 'friendly');
+            source.setAttribute('data-occupied', '');
+            player.setAttributeNS(null, "data-x", x);
+            player.setAttributeNS(null, "data-y", y);
+            resetTiles();
+          }
         }, false);
       }
 

@@ -16,6 +16,7 @@ svg { border: 1px solid teal; }
 
 .tile:hover, .probed:hover, .path:hover {
   stroke: #ff0000;
+  stroke-dasharray: 2 2;
   fill: #ffcccc;
 }
 

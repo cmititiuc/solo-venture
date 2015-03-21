@@ -56,6 +56,7 @@ function makeUnit(x, y) {
   var target = document.getElementById('tile-' + x + '-' + y);
   var cx = target.x.baseVal.value;
   var cy = target.y.baseVal.value;
+  target.setAttribute('data-occupied', 'friendly');
 
   var shape = svgDocument.createElementNS(svgns, "circle");
   shape.setAttributeNS(null, "cx", cx + tileWidth / 2);
