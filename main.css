@@ -50,3 +50,17 @@ circle:hover {
   stroke: #800000;
   fill: #ffcbcb;
 }
+
+.player circle {
+  fill-opacity: 1;
+  fill: #c66666;
+  stroke-width: 2;
+  stroke: maroon;
+}
+
+.enemy circle {
+  fill-opacity: 1;
+  fill: #64944a;
+  stroke-width: 2;
+  stroke: #297400;
+}

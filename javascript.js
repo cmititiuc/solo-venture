@@ -50,27 +50,30 @@ function makeRoom(x1, y1, x2, y2) {
   }
 }
 
-function makeUnit(x, y) {
+function makeUnit(x, y, iff) {
   var svgns = "http://www.w3.org/2000/svg";
   var svgDocument = document.getElementById('viewport').ownerDocument;
   var target = document.getElementById('tile-' + x + '-' + y);
   var cx = target.x.baseVal.value;
   var cy = target.y.baseVal.value;
-  target.setAttribute('data-occupied', 'friendly');
+  var iff = typeof iff !== 'undefined' ? iff : 'friendly';
+  target.setAttribute('data-occupied', iff);
 
   var shape = svgDocument.createElementNS(svgns, "circle");
   shape.setAttributeNS(null, "cx", cx + tileWidth / 2);
   shape.setAttributeNS(null, "cy", cy + tileHeight / 2);
   shape.setAttributeNS(null, "r", "10");
-  shape.setAttributeNS(null, "fill-opacity", "1");
-  shape.setAttributeNS(null, "fill", '#c66666');
-  shape.setAttributeNS(null, "stroke-width", "2");
-  shape.setAttributeNS(null, "stroke", "maroon");
-  // shape.setAttributeNS(null, "class", "");
 
   // document.getElementById('viewport').appendChild(shape);
 
-  var symbol = document.getElementsByClassName('player').length + 1;
+  var symbol;
+  if (iff == 'friendly')
+    symbol = document.getElementsByClassName('player').length + 1;
+  else {
+    var options = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '?', '/'];
+    symbol = options[Math.floor(Math.random() * options.length)];
+  }
+
   var data = svgDocument.createTextNode(symbol);
 
   var text = svgDocument.createElementNS(svgns, "text");
@@ -83,7 +86,7 @@ function makeUnit(x, y) {
   text.appendChild(data);
 
   var group = document.createElementNS("http://www.w3.org/2000/svg","g");
-  group.setAttribute("class", "player");
+  group.setAttribute("class", iff == 'friendly' ? "player" : "enemy");
   group.setAttribute("id", "player-" + symbol);
   group.setAttributeNS(null, "data-x", x);
   group.setAttributeNS(null, "data-y", y);

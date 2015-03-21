@@ -73,16 +73,21 @@
             markTile(v[0], v[1], 'path');
           }
         }
+
         var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
         var target = document.getElementById('tile-' + x + '-' + y);
-        if (target && !doorBetween(v[0], v[1], x, y, 'closed')) {
-          if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
-            find(x, y);
-            if (found == false && target.getAttribute('class') !== "probed") {
-              var history = v[2].slice();
-              history.push([ v[0], v[1] ]);
-              q.push([ x, y, history ]);
-              target.setAttribute('class', 'probed');
+        if (target) {
+          var occupied = target.getAttribute('data-occupied');
+          occupied = occupied && occupied != 'friendly';
+          if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
+            if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
+              find(x, y);
+              if (found == false && target.getAttribute('class') !== "probed") {
+                var history = v[2].slice();
+                history.push([ v[0], v[1] ]);
+                q.push([ x, y, history ]);
+                target.setAttribute('class', 'probed');
+              }
             }
           }
         }
@@ -158,7 +163,6 @@
         }, false);
       }
 
-      makeUnit(0, 0);
       makeRoom(1, 13, 4, 16);
       makeRoom(7, 15, 5, 12);
       makeFurniture(2, 14, 3, 15);
@@ -171,6 +175,10 @@
       makeDoor(6, 12, 6, 11);
       makeDoor(8, 14, 7, 14, 'open');
       makeDoor(8, 16, 9, 16, 'open');
+      makeUnit(0, 0);
+      makeUnit(0, 3);
+      makeUnit(10, 4, 'foe');
+      makeUnit(7, 14, 'foe');
 
       var doors = document.getElementsByClassName('door');
       for (var i = 0; i < doors.length; i++) {
