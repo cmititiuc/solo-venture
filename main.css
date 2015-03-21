@@ -1,0 +1,42 @@
+svg { border: 1px solid teal; }
+
+.tile {
+  fill: #ffffff;
+  fill-opacity: 1;
+  stroke: #cfcfcf;
+  stroke-width: 1;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 4;
+  stroke-opacity: 1;
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  display: inline;
+}
+
+.tile:hover, .probed:hover, .path:hover {
+  stroke: #ff0000;
+  fill: #ffcccc;
+}
+
+.room {
+  fill: none;
+  stroke: black;
+  stroke-width: 2;
+}
+
+.probed {
+  fill: #FFFFCC;
+  stroke: gold;
+}
+
+.path {
+  fill: #EEEEFF;
+  stroke: #9999FF;
+}
+
+circle:hover {
+  stroke: #000099;
+  fill-opacity: 1;
+  fill: #CCCCFF;
+}
