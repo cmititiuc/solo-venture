@@ -449,10 +449,12 @@ function board(document) {
     viewportHeight = viewport.height.baseVal.value;
     
     // draw tiles
-    for (var i = 0; i < map.length; i++) {
-      for (var j = 0; j < map[0].length; j++) {
-        if (map[i][j] != 0) {
-          makeRectangle(j, i);
+    if (document == window.document) {
+      for (var i = 0; i < map.length; i++) {
+        for (var j = 0; j < map[0].length; j++) {
+          if (map[i][j] != 0) {
+            makeRectangle(j, i);
+          }
         }
       }
     }
@@ -477,7 +479,7 @@ function board(document) {
       }, false);
     }
 
-    if (document.getElementById('viewport')) {
+    if (document == window.document) {
       makeRoom(1, 0, 4, 2);
       makeRoom(5, 0, 8, 2);
       makeRoom(9, 0, 11, 4);
@@ -557,5 +559,5 @@ function board(document) {
       }, false);
     }
   }
-  init();
+  return init;
 }

@@ -67,10 +67,14 @@
 
     function init() {
       var elm = document.getElementById('embed');
-      if (elm)
-        board(elm.getSVGDocument());
-      else
-        board();
+      if (elm) {
+        var init = board(elm.getSVGDocument());
+        init();
+      }
+      else {
+        var init = board();
+        init();
+      }
     }
   </script>
 </head>
@@ -87,13 +91,13 @@
   <h1>Against the Chaos Hordes</h1>
   <h2>(or Savage Tales of Mystery and Valor)</h2>
 
-<!--   <svg id="viewport"
+  <svg id="viewport"
        xmlns:xlink="http://www.w3.org/2000/svg"
        version="1.1"
        width="800"
        height="600">
-  </svg> -->
-  <embed id="embed" src="quest1.svg" type="image/svg+xml" />
+  </svg>
+  <!-- <embed id="embed" src="quest1.svg" type="image/svg+xml" /> -->
 
 </body>
 
