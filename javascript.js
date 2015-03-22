@@ -345,9 +345,12 @@ function updateMap() {
       'tile-' + player.getAttribute('data-x') + '-'
       + player.getAttribute('data-y'));
 
-    console.log('x: ' + x + ' y: ' + y);
+    console.log('target x: ' + x + ' y: ' + y);
+    console.log('source x: ' + player.getAttribute('data-x') + ' y: ' + player.getAttribute('data-y'));
+    console.log(player.getAttribute('transform'));
     player.setAttribute("transform", "translate("
       + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
+    console.log(player.getAttribute('transform'));
     this.setAttribute('data-occupied', 'friendly');
     source.setAttribute('data-occupied', '');
     player.setAttributeNS(null, "data-x", x);

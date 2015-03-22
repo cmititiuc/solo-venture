@@ -10,6 +10,7 @@ svg {
 body {
   background-color: #eae2bc;
   margin: 0 auto;
+  font-family: tahoma, verdana, sans-serif;
 }
 
 h1, h2 {
@@ -27,7 +28,7 @@ h2 {
 .tile {
   /*fill: #F6F6F6;*/
   fill: #DfDfDf;
-  fill-opacity: 1;
+  fill-opacity: .2;
   stroke: #BfBfBf;
   stroke-width: 1;
   stroke-linecap: butt;
