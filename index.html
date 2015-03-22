@@ -52,6 +52,7 @@
       "111111111111110000"
     ];
 
+    // convert map strings to arrays
     var selected_map = map2;
     for (var i = 0; i < selected_map.length; i++) {
       var row = [];
@@ -61,24 +62,17 @@
       map.push(row);
     }
 
-    var viewportWidth, viewportHeight;
+    var viewportWidth, viewportHeight, board;
     var tileWidth = 30, tileHeight = 30;
 
     function init() {
       if (elm = document.getElementById('embed')) { // use an embeded map
-        initBoard(elm.getSVGDocument()).init();
+        board = initBoard(elm.getSVGDocument());
+        // board.makeUnit(0, 17, 'foe'); // can add generated stuff to embeded
+        board.init();
       } else { // generate map on the fly
-        var board = initBoard();
-
-        // draw tiles
-        for (var i = 0; i < map.length; i++) {
-          for (var j = 0; j < map[0].length; j++) {
-            if (map[i][j] != 0) {
-              board.makeRectangle(j, i);
-            }
-          }
-        }
-
+        board = initBoard();
+        board.makeTiles(map);
         board.makeRoom(1, 0, 4, 2);
         board.makeRoom(5, 0, 8, 2);
         board.makeRoom(9, 0, 11, 4);

@@ -17,6 +17,156 @@ var initBoard = function(document) {
     }
   }
 
+  function makeMark(x, y) {
+    var svgns = "http://www.w3.org/2000/svg";
+    var svgDocument = document.getElementById('viewport').ownerDocument;
+    var target = document.getElementById('tile-' + x + '-' + y);
+    var x = target.x.baseVal.value;
+    var y = target.y.baseVal.value;
+
+    var shape = svgDocument.createElementNS(svgns, "line");
+    shape.setAttributeNS(null, "x1", x + tileWidth / 4);
+    shape.setAttributeNS(null, "y1", y + tileWidth / 4);
+    shape.setAttributeNS(null, "x2", x + tileWidth * .75);
+    shape.setAttributeNS(null, "y2", y + tileHeight * .75);
+    shape.setAttributeNS(null, "stroke-width", "2");
+    shape.setAttributeNS(null, "stroke", "black");
+
+    document.getElementById('viewport').appendChild(shape);
+
+    var shape = svgDocument.createElementNS(svgns, "line");
+    shape.setAttributeNS(null, "x1", x + tileWidth * .75);
+    shape.setAttributeNS(null, "y1", y + tileWidth / 4);
+    shape.setAttributeNS(null, "x2", x + tileWidth / 4);
+    shape.setAttributeNS(null, "y2", y + tileHeight * .75);
+    shape.setAttributeNS(null, "stroke-width", "2");
+    shape.setAttributeNS(null, "stroke", "black");
+
+    document.getElementById('viewport').appendChild(shape);
+  }
+
+  function sameRoom(node, target) {
+    var node_room = node.getAttribute('data-room');
+    return node_room == target.getAttribute('data-room');
+  }
+
+  function resetTiles() {
+    var path = document.getElementsByClassName('path');
+    while (path.length != 0) {
+      path[0].setAttribute('class', 'tile');
+    }
+    var probed = document.getElementsByClassName('probed');
+    while (probed.length != 0) {
+      probed[0].setAttribute('class', 'tile');
+    }
+  }
+
+  function markTile(x, y, className) {
+    var id = 'tile-' + x + '-' + y;
+    var target = document.getElementById(id);
+    target.setAttribute('class', className);
+  }
+
+  function updateMap() {
+    var occupied = this.getAttribute('data-occupied');
+    if (!occupied || occupied.length == 0) {
+      var x = this.id.match(/[0-9]+/);
+      var y = this.id.match(/[0-9]+$/);
+      var player = document.getElementsByClassName('player')[0];
+      var source = document.getElementById(
+        'tile-' + player.getAttribute('data-x') + '-'
+        + player.getAttribute('data-y'));
+
+      console.log('target x: ' + x + ' y: ' + y);
+      console.log('source x: ' + player.getAttribute('data-x')
+        + ' y: ' + player.getAttribute('data-y'));
+      console.log(player.getAttribute('transform'));
+      player.setAttribute("transform", "translate("
+        + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
+      console.log(player.getAttribute('transform'));
+      this.setAttribute('data-occupied', 'friendly');
+      source.setAttribute('data-occupied', '');
+      player.setAttributeNS(null, "data-x", x);
+      player.setAttributeNS(null, "data-y", y);
+      resetTiles();
+    }
+  }
+  
+  function doorBetween(x1, y1, x2, y2, state) {
+    if (x1 == x2) {
+      var temp = Math.min(y1, y2);
+      var y2 = Math.max(y1, y2);
+      y1 = temp;
+    } else {
+      var temp = Math.min(x1, x2);
+      var x2 = Math.max(x1, x2);
+      x1 = temp;
+    }
+    var id = 'door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+    var door = document.getElementById(id);
+    if (door && door.getAttribute('data-state') == state)
+      return true;
+    else
+      return false;
+  }
+  
+  function drawShortestPath(x1, y1, x2, y2) {
+    var source = document.getElementById('tile-' + x1 + '-' + y1);
+    source.setAttribute('class', 'probed');
+    var q = [];
+    var found = false;
+    q.push([x1, y1, []]);
+    probe([x1, y1, []], x1, y1);
+
+    function find(v, x, y) {
+      if (x == x2 && y == y2) {
+        found = true;
+        q = []; // only need if running as while loop
+        for (var i = 0; i < v[2].length; i++) {
+          markTile(v[2][i][0], v[2][i][1], 'path');
+        }
+        markTile(x2, y2, 'path');
+        markTile(v[0], v[1], 'path');
+      }
+    }
+
+    function probe(v, x, y) {
+      var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
+      var target = document.getElementById('tile-' + x + '-' + y);
+      if (target) {
+        var occupied = target.getAttribute('data-occupied');
+        occupied = occupied && occupied != 'friendly';
+        if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
+          if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
+            find(v, x, y);
+            if (found == false && target.getAttribute('class') !== "probed") {
+              var history = v[2].slice();
+              history.push([ v[0], v[1] ]);
+              q.push([ x, y, history ]);
+              target.setAttribute('class', 'probed');
+            }
+          }
+        }
+      }
+    }
+
+    // (function step() {
+      // if (q.length !== 0) {
+      while (q.length !== 0) {
+        var v = q.shift();
+        var id = 'tile-' + v[0] + '-' + v[1];
+        var node = document.getElementById(id);
+
+        probe(v, v[0]     , +v[1] - 1); // north
+        probe(v, v[0]     , +v[1] + 1); // south
+        probe(v, +v[0] + 1, v[1]     ); // east
+        probe(v, +v[0] - 1, v[1]     ); // west
+
+        // if (found == false) setTimeout(step, 1);
+      }
+    // })();
+  }
+
   pub.makeRectangle = function(x, y) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
@@ -44,9 +194,9 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "height",
       (Math.abs(y1 - y2) + 1) * (tileHeight + 1) - 1);
     shape.setAttributeNS(null, "class", "room");
-    // shape.setAttributeNS(null, "id", "");
     
     document.getElementById('viewport').appendChild(shape);
+    
     // set data-room attributes for all tiles in the room
     var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
     for (var i = Math.min(x1, x2); i <= Math.max(x1, x2); i++) {
@@ -71,13 +221,11 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "cy", coord('y', 0) + tileHeight / 2);
     shape.setAttributeNS(null, "r", "10");
 
-    // document.getElementById('viewport').appendChild(shape);
-
     var symbol;
     if (iff == 'friendly')
       symbol = document.getElementsByClassName('player').length + 1;
     else {
-      var options = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '?', '/'];
+      var options = ['!', '@', '#', '$', '%', '^', '&', '*'];
       symbol = options[Math.floor(Math.random() * options.length)];
     }
 
@@ -103,34 +251,6 @@ var initBoard = function(document) {
     group.setAttribute("transform", "translate("
       + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
     document.getElementById('viewport').appendChild(group);
-  }
-
-  function makeMark(x, y) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
-    var target = document.getElementById('tile-' + x + '-' + y);
-    var x = target.x.baseVal.value;
-    var y = target.y.baseVal.value;
-
-    var shape = svgDocument.createElementNS(svgns, "line");
-    shape.setAttributeNS(null, "x1", x + tileWidth / 4);
-    shape.setAttributeNS(null, "y1", y + tileWidth / 4);
-    shape.setAttributeNS(null, "x2", x + tileWidth * .75);
-    shape.setAttributeNS(null, "y2", y + tileHeight * .75);
-    shape.setAttributeNS(null, "stroke-width", "2");
-    shape.setAttributeNS(null, "stroke", "black");
-
-    document.getElementById('viewport').appendChild(shape);
-
-    var shape = svgDocument.createElementNS(svgns, "line");
-    shape.setAttributeNS(null, "x1", x + tileWidth * .75);
-    shape.setAttributeNS(null, "y1", y + tileWidth / 4);
-    shape.setAttributeNS(null, "x2", x + tileWidth / 4);
-    shape.setAttributeNS(null, "y2", y + tileHeight * .75);
-    shape.setAttributeNS(null, "stroke-width", "2");
-    shape.setAttributeNS(null, "stroke", "black");
-
-    document.getElementById('viewport').appendChild(shape);
   }
 
   pub.makeDoor = function(x1, y1, x2, y2, state) {
@@ -176,17 +296,6 @@ var initBoard = function(document) {
     document.getElementById('viewport').appendChild(shape);
   }
 
-  function moveUnit(id, x, y) {
-    var unit = document.getElementById(id);
-    var target = document.getElementById('tile-' + x + '-' + y);
-    var cx = target.x.baseVal.value;
-    var cy = target.y.baseVal.value;
-    unit.setAttributeNS(null, "cx", cx + tileWidth / 2);
-    unit.setAttributeNS(null, "cy", cy + tileHeight / 2);
-    unit.setAttributeNS(null, "data-x", x);
-    unit.setAttributeNS(null, "data-y", y);
-  }
-
   pub.makeFurniture = function (x1, y1, x2, y2) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
@@ -204,8 +313,10 @@ var initBoard = function(document) {
     var shape = svgDocument.createElementNS(svgns, "rect");
     shape.setAttributeNS(null, "x", coord('x', x1) + tileWidth * .10);
     shape.setAttributeNS(null, "y", coord('y', y1) + tileHeight * .10);
-    shape.setAttributeNS(null, "width",  tileWidth * (Math.abs(x1 - x2) + 1) - tileWidth * .20);
-    shape.setAttributeNS(null, "height", tileHeight * (Math.abs(y1 - y2) + 1) - tileHeight * .20);
+    shape.setAttributeNS(null, "width",
+      tileWidth * (Math.abs(x1 - x2) + 1) - tileWidth * .20);
+    shape.setAttributeNS(null, "height",
+      tileHeight * (Math.abs(y1 - y2) + 1) - tileHeight * .20);
     shape.setAttributeNS(null, "class", "furniture");
     // shape.setAttributeNS(null, "id", "");
     
@@ -221,238 +332,22 @@ var initBoard = function(document) {
     }
   }
 
-  // from en.wikipedia.org/wiki/Breadth-first_search#Pseudocode
-  function bfs(x, y) {
-    var target = document.getElementById('tile-' + x + '-' + y);
-    var q = [], id;
-    q.push([x, y]);
-    target.style.stroke = "green";
-    target.style.fill = "#CCFFCC";
-    while(q.length !== 0) {
-      var v = q.shift();
-      target = document.getElementById('tile-' + v[0] + '-' + v[1]);
-      // north
-      id = 'tile-' + v[0] + '-' + (v[1] - 1);
-      if (target = document.getElementById(id)) {
-        if (target.style.stroke !== "green") {
-          q.push([v[0], v[1] - 1]);
-          target.style.stroke = "green";
-          target.style.fill = "#CCFFCC";
-        }
-      }
-      // south
-      id = 'tile-' + v[0] + '-' + (v[1] + 1);
-      if (target = document.getElementById(id)) {
-        if (target.style.stroke !== "green") {
-          q.push([v[0], v[1] + 1]);
-          target.style.stroke = "green";
-          target.style.fill = "#CCFFCC";
-        }
-      }
-      // east
-      id = 'tile-' + (v[0] + 1) + '-' + v[1];
-      if (target = document.getElementById(id)) {
-        if (target.style.stroke !== "green") {
-          q.push([v[0] + 1, v[1]]);
-          target.style.stroke = "green";
-          target.style.fill = "#CCFFCC";
-        }
-      }
-      // west
-      id = 'tile-' + (v[0] - 1) + '-' + v[1];
-      if (target = document.getElementById(id)) {
-        if (target.style.stroke !== "green") {
-          q.push([v[0] - 1, v[1]]);
-          target.style.stroke = "green";
-          target.style.fill = "#CCFFCC";
-        }
+  pub.makeTiles = function(map) {
+    for (var i = 0; i < map.length; i++) {
+      for (var j = 0; j < map[0].length; j++) {
+        if (map[i][j] != 0) pub.makeRectangle(j, i);
       }
     }
-  }
-
-  // slowed down version of bfs with range
-  function bfsSlow(x, y, range) {
-    var range = typeof range !== 'undefined' ? range : 5;
-    var target = document.getElementById('tile-' + x + '-' + y);
-    var q = [];
-    q.push([x, y, 0]);
-    target.style.stroke = "green";
-    target.style.fill = "#CCFFCC";
-    (function step() {
-      if (q.length !== 0) {
-        var v = q.shift(), id;
-        // north
-        id = 'tile-' + v[0] + '-' + (v[1] - 1);
-        if (target = document.getElementById(id)) {
-          if (target.style.stroke !== "green" && v[2] < range) {
-            q.push([v[0], v[1] - 1, v[2] + 1]);
-            target.style.stroke = "green";
-            target.style.fill = "#CCFFCC";
-          }
-        }
-        // south
-        id = 'tile-' + v[0] + '-' + (v[1] + 1);
-        if (target = document.getElementById(id)) {
-          if (target.style.stroke !== "green" && v[2] < range) {
-            q.push([v[0], v[1] + 1, v[2] + 1]);
-            target.style.stroke = "green";
-            target.style.fill = "#CCFFCC";
-          }
-        }
-        // east
-        id = 'tile-' + (v[0] + 1) + '-' + v[1];
-        if (target = document.getElementById(id)) {
-          if (target.style.stroke !== "green" && v[2] < range) {
-            q.push([v[0] + 1, v[1], v[2] + 1]);
-            target.style.stroke = "green";
-            target.style.fill = "#CCFFCC";
-          }
-        }
-        // west
-        id = 'tile-' + (v[0] - 1) + '-' + v[1];
-        if (target = document.getElementById(id)) {
-          if (target.style.stroke !== "green" && v[2] < range) {
-            q.push([v[0] - 1, v[1], v[2] + 1]);
-            target.style.stroke = "green";
-            target.style.fill = "#CCFFCC";
-          }
-        }
-        setTimeout(step, 250);
-      }
-    })();
-  }
-
-  function sameRoom(node, target) {
-    var node_room = node.getAttribute('data-room');
-    return node_room == target.getAttribute('data-room');
-  }
-
-  function resetTiles() {
-    var path = document.getElementsByClassName('path');
-    while (path.length != 0) {
-      path[0].setAttribute('class', 'tile');
-    }
-    var probed = document.getElementsByClassName('probed');
-    while (probed.length != 0) {
-      probed[0].setAttribute('class', 'tile');
-    }
-  }
-
-  function markTile(x, y, className) {
-    var id = 'tile-' + x + '-' + y;
-    var target = document.getElementById(id);
-    target.setAttribute('class', className);
-  }
-
-  function updateMap() {
-    var occupied = this.getAttribute('data-occupied');
-    if (!occupied || occupied.length == 0) {
-      var x = this.id.match(/[0-9]+/);
-      var y = this.id.match(/[0-9]+$/);
-      var player = document.getElementsByClassName('player')[0];
-      var source = document.getElementById(
-        'tile-' + player.getAttribute('data-x') + '-'
-        + player.getAttribute('data-y'));
-
-      console.log('target x: ' + x + ' y: ' + y);
-      console.log('source x: ' + player.getAttribute('data-x') + ' y: ' + player.getAttribute('data-y'));
-      console.log(player.getAttribute('transform'));
-      player.setAttribute("transform", "translate("
-        + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
-      console.log(player.getAttribute('transform'));
-      this.setAttribute('data-occupied', 'friendly');
-      source.setAttribute('data-occupied', '');
-      player.setAttributeNS(null, "data-x", x);
-      player.setAttributeNS(null, "data-y", y);
-      resetTiles();
-    }
-  }
-
-  function drawShortestPath(x1, y1, x2, y2) {
-    // makeMark(x1, y1);
-    // makeMark(x2, y2);
-    var source = document.getElementById('tile-' + x1 + '-' + y1);
-    source.setAttribute('class', 'probed');
-    var q = [];
-    var found = false;
-    q.push([x1, y1, []]);
-    probe([x1, y1, []], x1, y1);
-
-    function probe(v, x, y) {
-      function find(x, y) {
-        if (x == x2 && y == y2) {
-          found = true;
-          q = []; // only need if running as while loop
-          for (var i = 0; i < v[2].length; i++) {
-            markTile(v[2][i][0], v[2][i][1], 'path');
-          }
-          markTile(x2, y2, 'path');
-          markTile(v[0], v[1], 'path');
-        }
-      }
-
-      var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
-      var target = document.getElementById('tile-' + x + '-' + y);
-      if (target) {
-        var occupied = target.getAttribute('data-occupied');
-        occupied = occupied && occupied != 'friendly';
-        if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
-          if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
-            find(x, y);
-            if (found == false && target.getAttribute('class') !== "probed") {
-              var history = v[2].slice();
-              history.push([ v[0], v[1] ]);
-              q.push([ x, y, history ]);
-              target.setAttribute('class', 'probed');
-            }
-          }
-        }
-      }
-    }
-
-    // (function step() {
-      // if (q.length !== 0) {
-      while (q.length !== 0) {
-        var v = q.shift();
-        var id = 'tile-' + v[0] + '-' + v[1];
-        var node = document.getElementById(id);
-
-        probe(v, v[0]     , +v[1] - 1); // north
-        probe(v, v[0]     , +v[1] + 1); // south
-        probe(v, +v[0] + 1, v[1]     ); // east
-        probe(v, +v[0] - 1, v[1]     ); // west
-
-        // if (found == false) setTimeout(step, 1);
-      }
-    // })();
-  }
-
-  function doorBetween(x1, y1, x2, y2, state) {
-    if (x1 == x2) {
-      var temp = Math.min(y1, y2);
-      var y2 = Math.max(y1, y2);
-      y1 = temp;
-    } else {
-      var temp = Math.min(x1, x2);
-      var x2 = Math.max(x1, x2);
-      x1 = temp;
-    }
-    var id = 'door-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
-    var door = document.getElementById(id);
-    if (door && door.getAttribute('data-state') == state)
-      return true;
-    else
-      return false;
   }
 
   pub.init = function () {
-    // move unit
+    // move unit listener
     var tiles = document.getElementsByClassName('tile');
     for (var i = 0; i < tiles.length; i++) {
       tiles[i].addEventListener('click', updateMap, false);
     }
 
-    // draw pathfinding
+    // draw pathfinding listeners
     for (var i = 0; i < tiles.length; i++) {
       tiles[i].addEventListener('mouseover', function() {
         var player = document.getElementsByClassName('player')[0];
@@ -468,7 +363,7 @@ var initBoard = function(document) {
       }, false);
     }
 
-    // open/close doors
+    // door open/close listener
     var doors = document.getElementsByClassName('door');
     for (var i = 0; i < doors.length; i++) {
       doors[i].addEventListener('click', function() {
