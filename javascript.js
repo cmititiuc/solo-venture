@@ -7,10 +7,10 @@ var initBoard = function(document) {
 
   function coord(axis, value) {
     if (axis == "x") {
-      return (viewportWidth / 2 - tileWidth * (map[0].length / 2)
+      return (viewportWidth / 2 - tileWidth * (map.layout[0].length / 2)
         + (tileWidth + 1) * value);
     } else if (axis == "y") {
-      return (viewportHeight / 2 - tileHeight * (map.length / 2)
+      return (viewportHeight / 2 - tileHeight * (map.layout.length / 2)
         + (tileHeight + 1) * value);
     } else {
       console.log("Axis " + axis + "not recognized.");
@@ -91,7 +91,7 @@ var initBoard = function(document) {
       resetTiles();
     }
   }
-  
+
   function doorBetween(x1, y1, x2, y2, state) {
     if (x1 == x2) {
       var temp = Math.min(y1, y2);
@@ -109,7 +109,7 @@ var initBoard = function(document) {
     else
       return false;
   }
-  
+
   function drawShortestPath(x1, y1, x2, y2) {
     var source = document.getElementById('tile-' + x1 + '-' + y1);
     source.setAttribute('class', 'probed');
