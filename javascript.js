@@ -60,8 +60,8 @@ function makeUnit(x, y, iff) {
   target.setAttribute('data-occupied', iff);
 
   var shape = svgDocument.createElementNS(svgns, "circle");
-  shape.setAttributeNS(null, "cx", cx + tileWidth / 2);
-  shape.setAttributeNS(null, "cy", cy + tileHeight / 2);
+  shape.setAttributeNS(null, "cx", coord('x', 0) + tileWidth / 2);
+  shape.setAttributeNS(null, "cy", coord('y', 0) + tileHeight / 2);
   shape.setAttributeNS(null, "r", "10");
 
   // document.getElementById('viewport').appendChild(shape);
@@ -79,8 +79,8 @@ function makeUnit(x, y, iff) {
   var text = svgDocument.createElementNS(svgns, "text");
   text.style.fontSize = "15px";
   text.style.fontWeight = "bold";
-  text.setAttributeNS(null, "x", cx + tileWidth / 2);
-  text.setAttributeNS(null, "y", cy + tileHeight / 2 + 5);
+  text.setAttributeNS(null, "x", coord('x', 0) + tileWidth / 2);
+  text.setAttributeNS(null, "y", coord('y', 0) + tileHeight / 2 + 5);
   text.setAttributeNS(null, "fill", "#F1E9D2");
   text.setAttributeNS(null, "text-anchor", "middle");
   text.appendChild(data);
@@ -93,6 +93,8 @@ function makeUnit(x, y, iff) {
   group.appendChild(shape);
   group.appendChild(text);
 
+  group.setAttribute("transform", "translate("
+    + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
   document.getElementById('viewport').appendChild(group);
 }
 
