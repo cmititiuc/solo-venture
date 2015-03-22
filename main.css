@@ -11,9 +11,10 @@ body {
   background-color: #eae2bc;
   margin: 0 auto;
   font-family: tahoma, verdana, sans-serif;
+  color: #7e7a65;
 }
 
-h1, h2 {
+h1, h2, h3 {
   text-align: center;
 }
 
@@ -23,6 +24,10 @@ h1 {
 
 h2 {
   font-size: 1em;
+}
+
+h3 {
+  font-size: .8em;
 }
 
 .tile {

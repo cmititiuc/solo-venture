@@ -1,6 +1,9 @@
-function board(document) {
+var initBoard = function(document) {
+  var pub = {};
   var document = typeof document !== 'undefined' ? document : window.document;
-  console.log(document);
+  var viewport = document.getElementById('viewport');
+  viewportWidth = viewport.width.baseVal.value;
+  viewportHeight = viewport.height.baseVal.value;
 
   function coord(axis, value) {
     if (axis == "x") {
@@ -14,7 +17,7 @@ function board(document) {
     }
   }
 
-  function makeRectangle(x, y) {
+  pub.makeRectangle = function(x, y) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
 
@@ -29,7 +32,7 @@ function board(document) {
     document.getElementById('viewport').appendChild(shape);
   }
 
-  function makeRoom(x1, y1, x2, y2) {
+  pub.makeRoom = function (x1, y1, x2, y2) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
 
@@ -54,7 +57,7 @@ function board(document) {
     }
   }
 
-  function makeUnit(x, y, iff) {
+  pub.makeUnit = function(x, y, iff) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
     var target = document.getElementById('tile-' + x + '-' + y);
@@ -130,7 +133,7 @@ function board(document) {
     document.getElementById('viewport').appendChild(shape);
   }
 
-  function makeDoor(x1, y1, x2, y2, state) {
+  pub.makeDoor = function(x1, y1, x2, y2, state) {
     // TODO: test to make sure tiles are adjacent
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
@@ -184,7 +187,7 @@ function board(document) {
     unit.setAttributeNS(null, "data-y", y);
   }
 
-  function makeFurniture(x1, y1, x2, y2) {
+  pub.makeFurniture = function (x1, y1, x2, y2) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
 
@@ -424,7 +427,6 @@ function board(document) {
     // })();
   }
 
-
   function doorBetween(x1, y1, x2, y2, state) {
     if (x1 == x2) {
       var temp = Math.min(y1, y2);
@@ -443,27 +445,14 @@ function board(document) {
       return false;
   }
 
-  function init() {
-    var viewport = document.getElementById('viewport');
-    viewportWidth = viewport.width.baseVal.value;
-    viewportHeight = viewport.height.baseVal.value;
-    
-    // draw tiles
-    if (document == window.document) {
-      for (var i = 0; i < map.length; i++) {
-        for (var j = 0; j < map[0].length; j++) {
-          if (map[i][j] != 0) {
-            makeRectangle(j, i);
-          }
-        }
-      }
-    }
-    
+  pub.init = function () {
+    // move unit
     var tiles = document.getElementsByClassName('tile');
     for (var i = 0; i < tiles.length; i++) {
       tiles[i].addEventListener('click', updateMap, false);
     }
 
+    // draw pathfinding
     for (var i = 0; i < tiles.length; i++) {
       tiles[i].addEventListener('mouseover', function() {
         var player = document.getElementsByClassName('player')[0];
@@ -479,73 +468,7 @@ function board(document) {
       }, false);
     }
 
-    if (document == window.document) {
-      makeRoom(1, 0, 4, 2);
-      makeRoom(5, 0, 8, 2);
-      makeRoom(9, 0, 11, 4);
-      makeRoom(1, 9, 4, 12);
-      makeRoom(1, 3, 4, 7);
-      makeRoom(5, 3, 8, 7);
-      makeRoom(1, 13, 4, 16);
-      makeRoom(5, 12, 8, 16);
-      makeRoom(9, 12, 11, 16);
-      makeRoom(14, 12, 17, 16);
-      makeRoom(10, 6, 15, 10);
-      makeFurniture(10, 0, 11, 2);
-      makeFurniture(10, 4, 10, 4);
-      makeFurniture(1, 4, 2, 6);
-      makeFurniture(6, 4, 8, 5);
-      makeFurniture(3, 9, 4, 11);
-      makeFurniture(5, 12, 7, 12);
-      makeFurniture(5, 14, 6, 16);
-      makeFurniture(11, 14, 11, 16);
-      makeFurniture(15, 12, 17, 12);
-      makeFurniture(15, 16, 17, 16);
-      makeFurniture(17, 15, 17, 15);
-      makeFurniture(11, 8, 13, 9);
-      makeFurniture(12, 6, 14, 6);
-      makeFurniture(11, 6, 11, 6);
-      makeFurniture(10, 7, 10, 7);
-      makeDoor(3, 2, 3, 3);
-      makeDoor(4, 1, 5, 1);
-      makeDoor(8, 1, 9, 1);
-      makeDoor(3, 7, 3, 8);
-      makeDoor(0, 10, 1, 10);
-      makeDoor(3, 16, 3, 17);
-      makeDoor(7, 16, 7, 17);
-      makeDoor(8, 14, 9, 14);
-      makeDoor(10, 11, 10, 12);
-      makeDoor(13, 14, 14, 14);
-      makeDoor(7, 7, 7, 8);
-      makeDoor(16, 8, 15, 8);
-      makeUnit(2, 14);
-      makeUnit(1, 14);
-      makeUnit(2, 1, 'foe');
-      makeUnit(3, 1, 'foe');
-      makeUnit(6, 0, 'foe');
-      makeUnit(6, 1, 'foe');
-      makeUnit(6, 2, 'foe');
-      makeUnit(9, 0, 'foe');
-      makeUnit(9, 2, 'foe');
-      makeUnit(9, 3, 'foe');
-      makeUnit(3, 5, 'foe');
-      makeUnit(4, 4, 'foe');
-      makeUnit(6, 6, 'foe');
-      makeUnit(7, 6, 'foe');
-      makeUnit(2, 10, 'foe');
-      makeUnit(2, 11, 'foe');
-      makeUnit(7, 13, 'foe');
-      makeUnit(8, 14, 'foe');
-      makeUnit(10, 13, 'foe');
-      makeUnit(10, 15, 'foe');
-      makeUnit(16, 14, 'foe');
-      makeUnit(15, 15, 'foe');
-      makeUnit(14, 7, 'foe');
-      makeUnit(11, 10, 'foe');
-      makeUnit(14, 10, 'foe');
-      makeUnit(12, 7, 'foe');
-    }
-
+    // open/close doors
     var doors = document.getElementsByClassName('door');
     for (var i = 0; i < doors.length; i++) {
       doors[i].addEventListener('click', function() {
@@ -559,5 +482,6 @@ function board(document) {
       }, false);
     }
   }
-  return init;
+
+  return pub;
 }
