@@ -89,6 +89,9 @@ var initBoard = function(document) {
       player.setAttributeNS(null, "data-x", x);
       player.setAttributeNS(null, "data-y", y);
       resetTiles();
+      var moveRoll = (Math.floor(Math.random() * 6) + 1)
+                     + (Math.floor(Math.random() * 6) + 1);
+      document.getElementById('movement-display').innerHTML = moveRoll;
     }
   }
 
@@ -110,11 +113,12 @@ var initBoard = function(document) {
       return false;
   }
 
-  function drawShortestPath(x1, y1, x2, y2) {
+  function drawShortestPath(x1, y1, x2, y2, range) {
     var source = document.getElementById('tile-' + x1 + '-' + y1);
     source.setAttribute('class', 'probed');
     var q = [];
     var found = false;
+    var range = typeof range !== 'undefined' ? range : 0;
     q.push([x1, y1, []]);
     probe([x1, y1, []], x1, y1);
 
@@ -133,7 +137,7 @@ var initBoard = function(document) {
     function probe(v, x, y) {
       var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
       var target = document.getElementById('tile-' + x + '-' + y);
-      if (target) {
+      if (target && (range == 0 || v[2].length <= range)) {
         var occupied = target.getAttribute('data-occupied');
         occupied = occupied && occupied != 'friendly';
         if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
@@ -340,6 +344,24 @@ var initBoard = function(document) {
     }
   }
 
+  function makeMovementDisplay() {
+    var svgns = "http://www.w3.org/2000/svg";
+    var svgDocument = document.getElementById('viewport').ownerDocument;
+    var moveRoll = (Math.floor(Math.random() * 6) + 1)
+                   + (Math.floor(Math.random() * 6) + 1);
+    var data = svgDocument.createTextNode(moveRoll.toString());
+    var text = svgDocument.createElementNS(svgns, "text");
+    text.style.fontSize = "15px";
+    text.style.fontWeight = "bold";
+    text.setAttributeNS(null, "x", 15);
+    text.setAttributeNS(null, "y", viewportHeight - 5);
+    text.setAttributeNS(null, "fill", "black");
+    text.setAttributeNS(null, "text-anchor", "middle");
+    text.setAttributeNS(null, "id", "movement-display");
+    text.appendChild(data);
+    document.getElementById('viewport').appendChild(text);
+  }
+
   pub.init = function () {
     // move unit listener
     var tiles = document.getElementsByClassName('tile');
@@ -376,6 +398,8 @@ var initBoard = function(document) {
         }
       }, false);
     }
+
+    makeMovementDisplay();
   }
 
   return pub;
