@@ -8,10 +8,10 @@ var initBoard = function(document) {
   function coord(axis, value) {
     if (axis == "x") {
       return (viewportWidth / 2 - tileWidth * (map.layout[0].length / 2)
-        + (tileWidth + 1) * value);
+        + (tileWidth + 1) * value - tileWidth / 4 - 1);
     } else if (axis == "y") {
       return (viewportHeight / 2 - tileHeight * (map.layout.length / 2)
-        + (tileHeight + 1) * value);
+        + (tileHeight + 1) * value - tileHeight / 4 - 1);
     } else {
       console.log("Axis " + axis + "not recognized.");
     }
