@@ -50,6 +50,11 @@ var initBoard = function(document) {
     return node_room == target.getAttribute('data-room');
   }
 
+  function adjacent(x1, y1, x2, y2) {
+    // console.log('x1: ' + x1 + ' y1: ' + y1 + ' x2: ' + x2 + ' y2: ' + y2);
+    return false;
+  }
+
   function resetTiles() {
     var path = document.getElementsByClassName('path');
     while (path.length != 0) {
@@ -87,7 +92,6 @@ var initBoard = function(document) {
         occupied = occupied && occupied != 'friendly';
         if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
           if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
-            // find(v, x, y);
             if (target.getAttribute('class') !== "probed") {
               var history = v[2].slice();
               history.push([ v[0], v[1] ]);
@@ -114,21 +118,31 @@ var initBoard = function(document) {
         // if (found == false) setTimeout(step, 1);
       }
     // })();
-
-
-
   }
 
   function updateMap() {
     var className = this.getAttribute('class');
+    var player = document.getElementsByClassName('player')[0];
+    var playerX = player.getAttribute('data-x');
+    var playerY = player.getAttribute('data-y');
     
     if (className == 'door') {
-      if (this.getAttribute('data-state') == 'open') {
-        this.setAttribute('data-state', 'closed');
-        this.style.stroke = 'red';
-      } else {
-        this.setAttribute('data-state', 'open');
-        this.style.stroke = 'green';
+      var id = this.getAttribute('id');
+      var firstCoords = id.match(/[0-9]+-[0-9]+/)[0];
+      var secondCoords = id.match(/[0-9]+-[0-9]+$/)[0];
+      var x1 = firstCoords.match(/[0-9]+/)[0];
+      var y1 = firstCoords.match(/[0-9]+$/)[0];
+      var x2 = secondCoords.match(/[0-9]+/)[0];
+      var y2 = secondCoords.match(/[0-9]+$/)[0];
+      // console.log('x1: ' + x1 + ' y1: ' + y1 + ' x2: ' + x2 + ' y2: ' + y2);
+      if ((playerX == x1 && playerY == y1) || (playerX == x2 && playerY == y2)) {
+        if (this.getAttribute('data-state') == 'open') {
+          this.setAttribute('data-state', 'closed');
+          this.style.stroke = 'red';
+        } else {
+          this.setAttribute('data-state', 'open');
+          this.style.stroke = 'green';
+        }
       }
     }
 
@@ -137,14 +151,11 @@ var initBoard = function(document) {
       if (className == 'probed') {
         var x = this.id.match(/[0-9]+/);
         var y = this.id.match(/[0-9]+$/);
-        var player = document.getElementsByClassName('player')[0];
-        var source = document.getElementById(
-          'tile-' + player.getAttribute('data-x') + '-'
-          + player.getAttribute('data-y'));
+        var id = 'tile-' + playerX + '-' + playerY;
+        var source = document.getElementById(id);
 
         console.log('target x: ' + x + ' y: ' + y);
-        console.log('source x: ' + player.getAttribute('data-x')
-          + ' y: ' + player.getAttribute('data-y'));
+        console.log('source x: ' + playerX + ' y: ' + playerY);
         console.log(player.getAttribute('transform'));
         player.setAttribute("transform", "translate("
           + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
@@ -272,6 +283,8 @@ var initBoard = function(document) {
     document.getElementById('viewport').appendChild(shape);
   }
 
+  /* TODO: I did this wrong.  Params should be (x, y, width, height).
+     Same for makeFurniture(). */
   pub.makeRoom = function (x1, y1, x2, y2) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
