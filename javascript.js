@@ -67,31 +67,99 @@ var initBoard = function(document) {
     target.setAttribute('class', className);
   }
 
+  function drawRange(id, range) {
+    var player = document.getElementById(id);
+    var x = player.getAttribute("data-x");
+    var y = player.getAttribute("data-y");
+    var source = document.getElementById('tile-' + x + '-' + y);
+    source.setAttribute('class', 'probed');
+    var q = [];
+    var range = typeof range !== 'undefined' ? range : 0;
+    q.push([x, y, []]);
+    probe([x, y, []], x, y);
+
+    function probe(v, x, y) {
+      var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
+      var target = document.getElementById('tile-' + x + '-' + y);
+      // console.log('range: ' + range + ' v[2].length: ' + v[2].length);
+      if (target && (range == 0 || v[2].length < range)) {
+        var occupied = target.getAttribute('data-occupied');
+        occupied = occupied && occupied != 'friendly';
+        if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
+          if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
+            // find(v, x, y);
+            if (target.getAttribute('class') !== "probed") {
+              var history = v[2].slice();
+              history.push([ v[0], v[1] ]);
+              q.push([ x, y, history ]);
+              target.setAttribute('class', 'probed');
+            }
+          }
+        }
+      }
+    }
+
+    // (function step() {
+      // if (q.length !== 0) {
+      while (q.length !== 0) {
+        var v = q.shift();
+        var id = 'tile-' + v[0] + '-' + v[1];
+        var node = document.getElementById(id);
+
+        probe(v, v[0]     , +v[1] - 1); // north
+        probe(v, v[0]     , +v[1] + 1); // south
+        probe(v, +v[0] + 1, v[1]     ); // east
+        probe(v, +v[0] - 1, v[1]     ); // west
+
+        // if (found == false) setTimeout(step, 1);
+      }
+    // })();
+
+
+
+  }
+
   function updateMap() {
+    var className = this.getAttribute('class');
+    
+    if (className == 'door') {
+      if (this.getAttribute('data-state') == 'open') {
+        this.setAttribute('data-state', 'closed');
+        this.style.stroke = 'red';
+      } else {
+        this.setAttribute('data-state', 'open');
+        this.style.stroke = 'green';
+      }
+    }
+
     var occupied = this.getAttribute('data-occupied');
     if (!occupied || occupied.length == 0) {
-      var x = this.id.match(/[0-9]+/);
-      var y = this.id.match(/[0-9]+$/);
-      var player = document.getElementsByClassName('player')[0];
-      var source = document.getElementById(
-        'tile-' + player.getAttribute('data-x') + '-'
-        + player.getAttribute('data-y'));
+      if (className !== 'door') {
+        var x = this.id.match(/[0-9]+/);
+        var y = this.id.match(/[0-9]+$/);
+        var player = document.getElementsByClassName('player')[0];
+        var source = document.getElementById(
+          'tile-' + player.getAttribute('data-x') + '-'
+          + player.getAttribute('data-y'));
 
-      console.log('target x: ' + x + ' y: ' + y);
-      console.log('source x: ' + player.getAttribute('data-x')
-        + ' y: ' + player.getAttribute('data-y'));
-      console.log(player.getAttribute('transform'));
-      player.setAttribute("transform", "translate("
-        + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
-      console.log(player.getAttribute('transform'));
-      this.setAttribute('data-occupied', 'friendly');
-      source.setAttribute('data-occupied', '');
-      player.setAttributeNS(null, "data-x", x);
-      player.setAttributeNS(null, "data-y", y);
+        console.log('target x: ' + x + ' y: ' + y);
+        console.log('source x: ' + player.getAttribute('data-x')
+          + ' y: ' + player.getAttribute('data-y'));
+        console.log(player.getAttribute('transform'));
+        player.setAttribute("transform", "translate("
+          + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
+        console.log(player.getAttribute('transform'));
+        this.setAttribute('data-occupied', 'friendly');
+        source.setAttribute('data-occupied', '');
+        player.setAttributeNS(null, "data-x", x);
+        player.setAttributeNS(null, "data-y", y);
+        var moveRoll = (Math.floor(Math.random() * 6) + 1)
+                       + (Math.floor(Math.random() * 6) + 1);
+        document.getElementById('movement-display').innerHTML = moveRoll;
+      }
       resetTiles();
-      var moveRoll = (Math.floor(Math.random() * 6) + 1)
-                     + (Math.floor(Math.random() * 6) + 1);
-      document.getElementById('movement-display').innerHTML = moveRoll;
+      drawRange('player-1',
+        document.getElementById('movement-display').innerHTML);
     }
   }
 
@@ -111,6 +179,24 @@ var initBoard = function(document) {
       return true;
     else
       return false;
+  }
+
+  function makeMovementDisplay() {
+    var svgns = "http://www.w3.org/2000/svg";
+    var svgDocument = document.getElementById('viewport').ownerDocument;
+    var moveRoll = (Math.floor(Math.random() * 6) + 1)
+                   + (Math.floor(Math.random() * 6) + 1);
+    var data = svgDocument.createTextNode(moveRoll.toString());
+    var text = svgDocument.createElementNS(svgns, "text");
+    text.style.fontSize = "15px";
+    text.style.fontWeight = "bold";
+    text.setAttributeNS(null, "x", 15);
+    text.setAttributeNS(null, "y", viewportHeight - 5);
+    text.setAttributeNS(null, "fill", "black");
+    text.setAttributeNS(null, "text-anchor", "middle");
+    text.setAttributeNS(null, "id", "movement-display");
+    text.appendChild(data);
+    document.getElementById('viewport').appendChild(text);
   }
 
   function drawShortestPath(x1, y1, x2, y2, range) {
@@ -344,24 +430,6 @@ var initBoard = function(document) {
     }
   }
 
-  function makeMovementDisplay() {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
-    var moveRoll = (Math.floor(Math.random() * 6) + 1)
-                   + (Math.floor(Math.random() * 6) + 1);
-    var data = svgDocument.createTextNode(moveRoll.toString());
-    var text = svgDocument.createElementNS(svgns, "text");
-    text.style.fontSize = "15px";
-    text.style.fontWeight = "bold";
-    text.setAttributeNS(null, "x", 15);
-    text.setAttributeNS(null, "y", viewportHeight - 5);
-    text.setAttributeNS(null, "fill", "black");
-    text.setAttributeNS(null, "text-anchor", "middle");
-    text.setAttributeNS(null, "id", "movement-display");
-    text.appendChild(data);
-    document.getElementById('viewport').appendChild(text);
-  }
-
   pub.init = function () {
     // move unit listener
     var tiles = document.getElementsByClassName('tile');
@@ -370,36 +438,29 @@ var initBoard = function(document) {
     }
 
     // draw pathfinding listeners
-    for (var i = 0; i < tiles.length; i++) {
-      tiles[i].addEventListener('mouseover', function() {
-        var player = document.getElementsByClassName('player')[0];
-        var x1 = player.getAttribute('data-x');
-        var y1 = player.getAttribute('data-y');
-        var x2 = this.id.match(/[0-9]+/);
-        var y2 = this.id.match(/[0-9]+$/);
-        drawShortestPath(x1, y1, x2, y2);
-      }, false);
+    // for (var i = 0; i < tiles.length; i++) {
+    //   tiles[i].addEventListener('mouseover', function() {
+    //     var player = document.getElementsByClassName('player')[0];
+    //     var x1 = player.getAttribute('data-x');
+    //     var y1 = player.getAttribute('data-y');
+    //     var x2 = this.id.match(/[0-9]+/);
+    //     var y2 = this.id.match(/[0-9]+$/);
+    //     drawShortestPath(x1, y1, x2, y2);
+    //   }, false);
 
-      tiles[i].addEventListener('mouseout', function() {
-        resetTiles();
-      }, false);
-    }
+    //   tiles[i].addEventListener('mouseout', function() {
+    //     resetTiles();
+    //   }, false);
+    // }
 
     // door open/close listener
     var doors = document.getElementsByClassName('door');
     for (var i = 0; i < doors.length; i++) {
-      doors[i].addEventListener('click', function() {
-        if (this.getAttribute('data-state') == 'open') {
-          this.setAttribute('data-state', 'closed');
-          this.style.stroke = 'red';
-        } else {
-          this.setAttribute('data-state', 'open');
-          this.style.stroke = 'green';
-        }
-      }, false);
+      doors[i].addEventListener('click', updateMap, false);
     }
 
     makeMovementDisplay();
+    drawRange('player-1', document.getElementById('movement-display').innerHTML);
   }
 
   return pub;
