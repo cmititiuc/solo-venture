@@ -153,6 +153,10 @@ var initBoard = function(document) {
         var y = this.id.match(/[0-9]+$/);
         var id = 'tile-' + playerX + '-' + playerY;
         var source = document.getElementById(id);
+        resetTiles(); // must reset before pathLength because my
+        // pathing algos use the class of the tile to save state.
+        // Might want to do this differently in the future.
+        var pathLength = getPathLength(playerX, playerY, x, y);
 
         console.log('target x: ' + x + ' y: ' + y);
         console.log('source x: ' + playerX + ' y: ' + playerY);
@@ -166,7 +170,10 @@ var initBoard = function(document) {
         player.setAttributeNS(null, "data-y", y);
         var moveRoll = (Math.floor(Math.random() * 6) + 1)
                        + (Math.floor(Math.random() * 6) + 1);
-        document.getElementById('movement-display').innerHTML = moveRoll;
+        if (+document.getElementById('movement-display').innerHTML - pathLength == 0)
+          document.getElementById('movement-display').innerHTML = moveRoll;
+        else
+          document.getElementById('movement-display').innerHTML = +document.getElementById('movement-display').innerHTML - pathLength;
       }
       resetTiles();
       drawRange('player-1',
@@ -208,6 +215,62 @@ var initBoard = function(document) {
     text.setAttributeNS(null, "id", "movement-display");
     text.appendChild(data);
     document.getElementById('viewport').appendChild(text);
+  }
+
+  function getPathLength(x1, y1, x2, y2) {
+    var source = document.getElementById('tile-' + x1 + '-' + y1);
+    source.setAttribute('class', 'probed');
+    var q = [];
+    var found = false;
+    var range = typeof range !== 'undefined' ? range : 0;
+    var pathLength;
+    q.push([x1, y1, []]);
+    probe([x1, y1, []], x1, y1);
+
+    function find(v, x, y) {
+      if (x == x2 && y == y2) {
+        found = true;
+        q = []; // only need if running as while loop
+        pathLength = v[2].length
+      }
+    }
+
+    function probe(v, x, y) {
+      var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
+      var target = document.getElementById('tile-' + x + '-' + y);
+      if (target && (range == 0 || v[2].length <= range)) {
+        var occupied = target.getAttribute('data-occupied');
+        occupied = occupied && occupied != 'friendly';
+        if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
+          if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
+            find(v, x, y);
+            if (found == false && target.getAttribute('class') !== "probed") {
+              var history = v[2].slice();
+              history.push([ v[0], v[1] ]);
+              q.push([ x, y, history ]);
+              target.setAttribute('class', 'probed');
+            }
+          }
+        }
+      }
+    }
+
+    // (function step() {
+      // if (q.length !== 0) {
+      while (q.length !== 0) {
+        var v = q.shift();
+        var id = 'tile-' + v[0] + '-' + v[1];
+        var node = document.getElementById(id);
+
+        probe(v, v[0]     , +v[1] - 1); // north
+        probe(v, v[0]     , +v[1] + 1); // south
+        probe(v, +v[0] + 1, v[1]     ); // east
+        probe(v, +v[0] - 1, v[1]     ); // west
+
+        // if (found == false) setTimeout(step, 1);
+      }
+    // })();
+    return pathLength + 1;
   }
 
   function drawShortestPath(x1, y1, x2, y2, range) {
