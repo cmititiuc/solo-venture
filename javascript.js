@@ -133,8 +133,8 @@ var initBoard = function(document) {
     }
 
     var occupied = this.getAttribute('data-occupied');
-    if (!occupied || occupied.length == 0) {
-      if (className !== 'door') {
+    if ((!occupied || occupied.length == 0)) {
+      if (className == 'probed') {
         var x = this.id.match(/[0-9]+/);
         var y = this.id.match(/[0-9]+$/);
         var player = document.getElementsByClassName('player')[0];
