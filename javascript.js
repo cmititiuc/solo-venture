@@ -4,6 +4,7 @@ var initBoard = function(document) {
   var viewport = document.getElementById('viewport');
   viewportWidth = viewport.width.baseVal.value;
   viewportHeight = viewport.height.baseVal.value;
+  playerTurn = 0;
 
   function coord(axis, value) {
     if (axis == "x") {
@@ -122,7 +123,7 @@ var initBoard = function(document) {
 
   function updateMap() {
     var className = this.getAttribute('class');
-    var player = document.getElementsByClassName('player')[0];
+    var player = document.getElementsByClassName('player')[playerTurn];
     var playerX = player.getAttribute('data-x');
     var playerY = player.getAttribute('data-y');
     
@@ -170,13 +171,16 @@ var initBoard = function(document) {
         player.setAttributeNS(null, "data-y", y);
         var moveRoll = (Math.floor(Math.random() * 6) + 1)
                        + (Math.floor(Math.random() * 6) + 1);
-        if (+document.getElementById('movement-display').innerHTML - pathLength == 0)
-          document.getElementById('movement-display').innerHTML = moveRoll;
-        else
-          document.getElementById('movement-display').innerHTML = +document.getElementById('movement-display').innerHTML - pathLength;
+        var moveDisplay = document.getElementById('movement-display');
+        if (+moveDisplay.innerHTML - pathLength == 0) {
+          moveDisplay.innerHTML = moveRoll;
+          var noPlayers = document.getElementsByClassName('player').length;
+          playerTurn = (playerTurn + 1) % noPlayers;
+        } else
+          moveDisplay.innerHTML = +moveDisplay.innerHTML - pathLength;
       }
       resetTiles();
-      drawRange('player-1',
+      drawRange('player-' + (+playerTurn + 1),
         document.getElementById('movement-display').innerHTML);
     }
   }
@@ -536,7 +540,8 @@ var initBoard = function(document) {
     }
 
     makeMovementDisplay();
-    drawRange('player-1', document.getElementById('movement-display').innerHTML);
+    drawRange('player-' + (+playerTurn + 1),
+      document.getElementById('movement-display').innerHTML);
   }
 
   return pub;
