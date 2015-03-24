@@ -540,8 +540,9 @@ var initBoard = function(document) {
     }
 
     makeMovementDisplay();
-    drawRange('player-' + (+playerTurn + 1),
-      document.getElementById('movement-display').innerHTML);
+    if (document.getElementsByClassName('player').length > 0)
+      drawRange('player-' + (+playerTurn + 1),
+                document.getElementById('movement-display').innerHTML);
   }
 
   return pub;

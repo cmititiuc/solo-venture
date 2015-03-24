@@ -26,7 +26,7 @@
       rules: function(board) { board.makeUnit(0, 0); }
     }
 
-    var map = {
+    var map4 = {
       layout: (function() {
         // var layout = new Array(9);
         // for (var i = 0; i < layout.length; i++)
@@ -44,9 +44,17 @@
         board.makeDoor(0, 2, 1, 2, 'open');
         board.makeDoor(0, 6, 1, 6);
         board.makeUnit(3, 3, 'foe');
-        // board.makeUnit(2, 6, 'foe');
+        board.makeUnit(2, 6, 'foe');
         board.makeFurniture(2, 2, 2, 3);
       }
+    };
+
+    var map = {
+      layout: [
+        '1'.repeat(20), '01'.repeat(10), '1'.repeat(20), '1'.repeat(20),
+        '1'.repeat(20), '1'.repeat(20), '1'.repeat(20)
+      ],
+      rules: function(board) {}
     };
 
     // convert map strings to arrays
@@ -78,6 +86,7 @@
         // board.makeDoor(16, 8, 15, 8);
         // TODO: if no coords, makeUnit() should place on random tile
         // board.makeUnit(0, 0);
+        // board.makeUnit(2, 13);
         // board.makeUnit(12, 7, 'foe');
       }
       board.init();
