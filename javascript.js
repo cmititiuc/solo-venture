@@ -122,7 +122,6 @@ var initBoard = function(document) {
   }
 
   function updateMap() {
-    var className = this.getAttribute('class');
     var player = document.getElementsByClassName('player')[playerTurn];
     if (!player) {
       console.log(this.id.match(/[0-9]+/) + ', ' + this.id.match(/[0-9]+$/));
@@ -130,6 +129,7 @@ var initBoard = function(document) {
     }
     var playerX = player.getAttribute('data-x');
     var playerY = player.getAttribute('data-y');
+    var className = this.getAttribute('class');
     
     if (className == 'door') {
       var id = this.getAttribute('id');
@@ -350,6 +350,7 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "height", tileHeight);
     shape.setAttributeNS(null, "class", "tile");
     shape.setAttributeNS(null, "id", "tile-" + x + "-" + y);
+    debug ? shape.style.opacity = '.2' : shape.style.display = 'none';
     
     document.getElementById('viewport').appendChild(shape);
   }
@@ -368,6 +369,8 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "height",
       (Math.abs(y1 - y2) + 1) * (tileHeight + 1) - 1);
     shape.setAttributeNS(null, "class", "room");
+    shape.setAttribute('id', 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2);
+    debug ? shape.style.opacity = '.2' : shape.style.display = 'none';
     
     document.getElementById('viewport').appendChild(shape);
     
@@ -416,6 +419,8 @@ var initBoard = function(document) {
 
     var group = document.createElementNS("http://www.w3.org/2000/svg","g");
     group.setAttribute("class", iff == 'friendly' ? "player" : "enemy");
+    if (iff != 'friendly')
+      debug ? group.style.opacity = '.2' : group.style.display = 'none';
     group.setAttribute("id", "player-" + symbol);
     group.setAttributeNS(null, "data-x", x);
     group.setAttributeNS(null, "data-y", y);
@@ -462,6 +467,7 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "class", "door");
     var id = "door-" + x1 + '-' + y1 + '-' + x2 + '-' + y2;
     shape.setAttributeNS(null, "id", id);
+    debug ? shape.style.opacity = '.2' : shape.style.display = 'none';
     if (state == 'open')
       shape.setAttributeNS(null, "stroke", "green");
     else
@@ -607,6 +613,24 @@ var initBoard = function(document) {
     // return coordinatesArray;
   }
 
+  function getDoors(tile) {
+    var id = tile.getAttribute('id');
+    var x = id.match(/[0-9]+/);
+    var y = id.match(/[0-9]+$/);
+    var doors = [];
+
+    id = 'door-' + (+x - 1) + '-' + y + '-' + x + '-' + y;
+    if (door = document.getElementById(id)) doors.push(door);
+    id = 'door-' + x + '-' + (+y - 1) + '-' + x + '-' + y;
+    if (door = document.getElementById(id)) doors.push(door);
+    id = 'door-' + x + '-' + y + '-' + (+x + 1) + '-' + y;
+    if (door = document.getElementById(id)) doors.push(door);
+    id = 'door-' + x + '-' + y + '-' + x + '-' + (+y + 1);
+    if (door = document.getElementById(id)) doors.push(door);
+
+    return doors;
+  }
+
   pub.init = function () {
     // move unit listener
     var tiles = document.getElementsByClassName('tile');
@@ -640,6 +664,44 @@ var initBoard = function(document) {
     if (document.getElementsByClassName('player').length > 0)
       drawRange('player-' + (+playerTurn + 1),
                 document.getElementById('movement-display').innerHTML);
+
+    // LOS
+    var players = document.getElementsByClassName('player');
+    for (var i = 0; i < players.length; i++) {
+      var player = players[i];
+      var playerX = player.getAttribute('data-x');
+      var playerY = player.getAttribute('data-y');
+
+      var id = 'tile-' + playerX + '-' + playerY;
+      var tile = document.getElementById(id);
+      // if player is in a room
+      if (room = tile.getAttribute('data-room')) {
+        // light up room's tiles
+        var firstCoords = room.match(/[0-9]+-[0-9]+/)[0];
+        var secondCoords = room.match(/[0-9]+-[0-9]+$/)[0];
+        var x1 = firstCoords.match(/[0-9]+/)[0];
+        var y1 = firstCoords.match(/[0-9]+$/)[0];
+        var x2 = secondCoords.match(/[0-9]+/)[0];
+        var y2 = secondCoords.match(/[0-9]+$/)[0];
+        for (var i = x1; i <= x2 - x1 + 1; i++) {
+          for (var j = y1; j <= y2 - y1 + 1; j++) {
+            var id = 'tile-' + i + '-' + j;
+            var tile = document.getElementById(id);
+            // light up that tile
+            tile.style.display = '';
+            debug ? tile.style.opacity = '1' : tile.style.display = '';
+            var doors = getDoors(tile);
+            for (var k = 0; k < doors.length; k++) {
+              doors[k].style.display = '';
+              debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
+            }
+          }
+        }
+        // light up room border
+        var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+        document.getElementById(id).style.display = '';
+      }
+    }
   }
 
   return pub;

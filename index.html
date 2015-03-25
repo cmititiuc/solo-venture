@@ -12,9 +12,10 @@
   <!-- <script src="maps/javascript/quest1.js"></script> -->
   <script>
     var map = map || { layout: [], rules: function(board) {}};
+    var debug = true;
 
     // line test map
-    var map = { layout: [
+    var map0 = { layout: [
       '11111', '11111', '11111',
       '11111', '11111', '11111',
       '11111', '11111', '11111'
@@ -23,7 +24,7 @@
     }};
 
     // LOS test map
-    var map0 = { layout: [
+    var map = { layout: [
       '11111', '11111', '11111', '11111', '11111', '11111',
       '11111', '11111', '11111', '11111'
     ], rules: function(board) {
@@ -31,6 +32,8 @@
       board.makeRoom(1, 6, 3, 8);
       board.makeDoor(2, 3, 2, 4);
       board.makeDoor(2, 8, 2, 9);
+      board.makeDoor(0, 1, 1, 1);
+      board.makeDoor(1, 0, 1, 1);
       board.makeUnit(2, 2);
       board.makeUnit(2, 7, 'foe');
     }};
