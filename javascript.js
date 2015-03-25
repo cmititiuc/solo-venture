@@ -124,6 +124,10 @@ var initBoard = function(document) {
   function updateMap() {
     var className = this.getAttribute('class');
     var player = document.getElementsByClassName('player')[playerTurn];
+    if (!player) {
+      console.log(this.id.match(/[0-9]+/) + ', ' + this.id.match(/[0-9]+$/));
+      return;
+    }
     var playerX = player.getAttribute('data-x');
     var playerY = player.getAttribute('data-y');
     
@@ -508,6 +512,99 @@ var initBoard = function(document) {
         if (map[i][j] != 0) pub.makeRectangle(j, i);
       }
     }
+  }
+
+  pub.drawLine = function(x1, y1, x2, y2) {
+    var svgns = "http://www.w3.org/2000/svg";
+    var svgDocument = document.getElementById('viewport').ownerDocument;
+    var shape = svgDocument.createElementNS(svgns, "line");
+    shape.setAttributeNS(null, "x1", coord('x', x1) + tileWidth / 2);
+    shape.setAttributeNS(null, "y1", coord('y', y1) + tileHeight / 2);
+    shape.setAttributeNS(null, "x2", coord('x', x2) + tileWidth / 2);
+    shape.setAttributeNS(null, "y2", coord('y', y2) + tileHeight / 2);
+    shape.setAttributeNS(null, "stroke-width", "1");
+    shape.setAttributeNS(null, "stroke", "blue");
+    document.getElementById('viewport').appendChild(shape);
+
+    var deltaX = x2 - x1;
+    var deltaY = y2 - y1;
+    var error = 0;
+    var deltaErr = Math.abs(deltaY / deltaX);
+    var y = y1;
+    function mark(x, y, error) {
+      var tile = document.getElementById('tile-' + i + '-' + y);
+      if (tile) {
+        tile.setAttribute('class', 'probed');
+        console.log('tile ' + i + ' ' + y + ' found error: ' + error);
+        return true;
+      } else {
+        console.log('tile not found error: ' + error);
+        //   tile = document.getElementById('tile-' + i + '-' + (+y - 1));
+        //   if (tile) {
+        //     tile.setAttribute('class', 'probed');
+        //     return true;
+        //   }
+        // } else {
+          console.log('LOS blocked');
+          return false;
+        // }
+      }
+    }
+    for (var i = 0; i <= x2 - x1; i++) { // 0, 1, 2
+      if (mark(i, y, error) == false) return;
+      error = error + deltaErr;
+      console.log('error: ' + error);
+      while (error >= 0.6) {
+        if (mark(i, y, error) == false) return;
+        y = y + (y2 - y1 < 0 ? -1 : 1);
+        error = error - 1.0;
+      }
+    }
+  }
+
+  pub.calcStraightLine = function(x1, y1, x2, y2) {
+    var svgns = "http://www.w3.org/2000/svg";
+    var svgDocument = document.getElementById('viewport').ownerDocument;
+    var shape = svgDocument.createElementNS(svgns, "line");
+    shape.setAttributeNS(null, "x1", coord('x', x1) + tileWidth / 2);
+    shape.setAttributeNS(null, "y1", coord('y', y1) + tileHeight / 2);
+    shape.setAttributeNS(null, "x2", coord('x', x2) + tileWidth / 2);
+    shape.setAttributeNS(null, "y2", coord('y', y2) + tileHeight / 2);
+    shape.setAttributeNS(null, "stroke-width", "1");
+    shape.setAttributeNS(null, "stroke", "blue");
+    document.getElementById('viewport').appendChild(shape);
+
+    var coordinatesArray = new Array();
+
+    // var x1 = startCoordinates.left;
+    // var y1 = startCoordinates.top;
+    // var x2 = endCoordinates.left;
+    // var y2 = endCoordinates.top;
+
+    var dx = Math.abs(x2 - x1);
+    var dy = Math.abs(y2 - y1);
+    var sx = (x1 < x2) ? 1 : -1;
+    var sy = (y1 < y2) ? 1 : -1;
+    var err = dx - dy;
+
+    var tile = document.getElementById('tile-' + x1 + '-' + y1);
+    tile.setAttribute('class', 'probed');
+
+    while (!((x1 == x2) && (y1 == y2))) {
+      var e2 = err << 1;
+      if (e2 > -dy) {
+        err -= dy;
+        x1 += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        y1 += sy;
+      }
+      // coordinatesArray.push([y1, x1]);
+      tile = document.getElementById('tile-' + x1 + '-' + y1);
+      tile.setAttribute('class', 'probed');
+    }
+    // return coordinatesArray;
   }
 
   pub.init = function () {

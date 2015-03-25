@@ -42,11 +42,11 @@ h3 {
   stroke-dasharray: none;
   stroke-dashoffset: 0;
   display: inline;
+  shape-rendering: crispEdges;
 }
 
 .tile:hover, .probed:hover, .path:hover {
   stroke: #ff0000;
-  stroke-dasharray: 2 2;
   fill: #ffcccc;
 }
 
@@ -54,6 +54,7 @@ h3 {
   fill: none;
   stroke: gray;
   stroke-width: 2;
+  shape-rendering: crispEdges;
 }
 
 .probed {
@@ -79,6 +80,7 @@ circle:hover {
 .furniture {
   stroke: #800000;
   fill: #ffcbcb;
+  shape-rendering: crispEdges;
 }
 
 .player circle {
