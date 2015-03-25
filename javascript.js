@@ -693,43 +693,28 @@ var initBoard = function(document) {
 
   function findVisible(sourceX, sourceY) {
     var tiles = document.getElementsByClassName('tile');
-    var losTiles = [];
-    for (var i = 0; i < tiles.length; i++) {
-      if (!tiles[i].getAttribute('data-room')) {
-        // targetX = tiles[i].id.match(/[0-9]+/);
-        // targetY = tiles[i].id.match(/[0-9]+$/);
-        // pub.drawLine(x, y, targetX, targetY);
-        losTiles.push(tiles[i]);
+    var corridorTiles = [];
+    var visibleTiles = [];
+
+    function mark(x, y) {
+      var tile = document.getElementById('tile-' + x + '-' + y);
+      if (tile && !(tile.getAttribute('data-room'))) {
+        visibleTiles.push(tile);
+        return true;
+      } else {
+        return false;
       }
     }
 
-    for (var i = 0; i < losTiles.length; i++) {
-      var x1 = +sourceX;
-      var y1 = +sourceY;
-      
-      var x2 = +(losTiles[i].id.match(/[0-9]+/)[0]);
-      var y2 = +(losTiles[i].id.match(/[0-9]+$/)[0]);
+    for (var i = 0; i < tiles.length; i++) {
+      if (!tiles[i].getAttribute('data-room')) corridorTiles.push(tiles[i]);
+    }
 
-      console.log('x1: ' + x1 + ' y1: ' + y1);
-      console.log('x2: ' + x2 + ' y2: ' + y2);
-
-      function mark(x, y) {
-        var tile = document.getElementById('tile-' + x + '-' + y);
-        if (tile && !(tile.getAttribute('data-room'))) {
-          debug ? tile.style.opacity = '1' : tile.style.display = '';
-          var doors = getDoors(tile);
-          for (var k = 0; k < doors.length; k++) {
-            doors[k].style.display = '';
-            debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
-          }
-          return true;          
-        } else {
-          return false;
-        }
-      }
-
+    for (var i = 0; i < corridorTiles.length; i++) {
+      var x1 = +sourceX, y1 = +sourceY;
+      var x2 = +(corridorTiles[i].id.match(/[0-9]+/)[0]);
+      var y2 = +(corridorTiles[i].id.match(/[0-9]+$/)[0]);
       var dx = Math.abs(x2 - x1);
-      if (dx == 0) continue;
       var dy = Math.abs(y2 - y1);
       var sx = (x1 < x2) ? 1 : -1;
       var sy = (y1 < y2) ? 1 : -1;
@@ -750,12 +735,9 @@ var initBoard = function(document) {
         }
         if (!mark(x, y)) break;
       }
-
     }
-//   debug ? losTiles[i].style.opacity = '1' : losTiles[i].style.display = '';
 
-    // pub.drawLine(0, 2, 1, 0);
-    return [];
+    return visibleTiles;
   }
 
   pub.init = function () {
@@ -786,11 +768,6 @@ var initBoard = function(document) {
     for (var i = 0; i < doors.length; i++) {
       doors[i].addEventListener('click', updateMap, false);
     }
-
-    makeMovementDisplay();
-    if (document.getElementsByClassName('player').length > 0  && false)
-      drawRange('player-' + (+playerTurn + 1),
-                document.getElementById('movement-display').innerHTML);
 
     // LOS
     var players = document.getElementsByClassName('player');
@@ -833,9 +810,19 @@ var initBoard = function(document) {
         var visibleTiles = findVisible(playerX, playerY);
         for (var i = 0; i < visibleTiles.length; i++) {
           debug ? visibleTiles[i].style.opacity = '1' : visibleTiles[i].style.display = '';
+          var doors = getDoors(visibleTiles[i]);
+          for (var k = 0; k < doors.length; k++) {
+            doors[k].style.display = '';
+            debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
+          }
         }
       }
     }
+
+    makeMovementDisplay();
+    if (document.getElementsByClassName('player').length > 0)
+      drawRange('player-' + (+playerTurn + 1),
+                document.getElementById('movement-display').innerHTML);
   }
 
   return pub;
