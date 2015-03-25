@@ -15,12 +15,12 @@
     var debug = true;
 
     // line test map
-    var map0 = { layout: [
+    var map1 = { layout: [
       '11111', '11111', '11111',
       '11111', '11111', '11111',
       '11111', '11111', '11111'
     ], rules: function(board) {
-      board.calcStraightLine(0, 0, 3, 6);
+      // board.calcStraightLine(0, 0, 3, 6);
     }};
 
     // LOS test map
@@ -34,7 +34,7 @@
       board.makeDoor(2, 8, 2, 9);
       board.makeDoor(0, 1, 1, 1);
       board.makeDoor(1, 0, 1, 1);
-      board.makeUnit(2, 2);
+      board.makeUnit(3, 4);
       board.makeUnit(2, 7, 'foe');
     }};
 

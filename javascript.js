@@ -339,6 +339,24 @@ var initBoard = function(document) {
     // })();
   }
 
+  function getDoors(tile) {
+    var id = tile.getAttribute('id');
+    var x = id.match(/[0-9]+/);
+    var y = id.match(/[0-9]+$/);
+    var doors = [];
+
+    id = 'door-' + (+x - 1) + '-' + y + '-' + x + '-' + y;
+    if (door = document.getElementById(id)) doors.push(door);
+    id = 'door-' + x + '-' + (+y - 1) + '-' + x + '-' + y;
+    if (door = document.getElementById(id)) doors.push(door);
+    id = 'door-' + x + '-' + y + '-' + (+x + 1) + '-' + y;
+    if (door = document.getElementById(id)) doors.push(door);
+    id = 'door-' + x + '-' + y + '-' + x + '-' + (+y + 1);
+    if (door = document.getElementById(id)) doors.push(door);
+
+    return doors;
+  }
+
   pub.makeRectangle = function(x, y) {
     var svgns = "http://www.w3.org/2000/svg";
     var svgDocument = document.getElementById('viewport').ownerDocument;
@@ -521,16 +539,16 @@ var initBoard = function(document) {
   }
 
   pub.drawLine = function(x1, y1, x2, y2) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
-    var shape = svgDocument.createElementNS(svgns, "line");
-    shape.setAttributeNS(null, "x1", coord('x', x1) + tileWidth / 2);
-    shape.setAttributeNS(null, "y1", coord('y', y1) + tileHeight / 2);
-    shape.setAttributeNS(null, "x2", coord('x', x2) + tileWidth / 2);
-    shape.setAttributeNS(null, "y2", coord('y', y2) + tileHeight / 2);
-    shape.setAttributeNS(null, "stroke-width", "1");
-    shape.setAttributeNS(null, "stroke", "blue");
-    document.getElementById('viewport').appendChild(shape);
+    // var svgns = "http://www.w3.org/2000/svg";
+    // var svgDocument = document.getElementById('viewport').ownerDocument;
+    // var shape = svgDocument.createElementNS(svgns, "line");
+    // shape.setAttributeNS(null, "x1", coord('x', x1) + tileWidth / 2);
+    // shape.setAttributeNS(null, "y1", coord('y', y1) + tileHeight / 2);
+    // shape.setAttributeNS(null, "x2", coord('x', x2) + tileWidth / 2);
+    // shape.setAttributeNS(null, "y2", coord('y', y2) + tileHeight / 2);
+    // shape.setAttributeNS(null, "stroke-width", "1");
+    // shape.setAttributeNS(null, "stroke", "blue");
+    // document.getElementById('viewport').appendChild(shape);
 
     var deltaX = x2 - x1;
     var deltaY = y2 - y1;
@@ -613,22 +631,131 @@ var initBoard = function(document) {
     // return coordinatesArray;
   }
 
-  function getDoors(tile) {
-    var id = tile.getAttribute('id');
-    var x = id.match(/[0-9]+/);
-    var y = id.match(/[0-9]+$/);
-    var doors = [];
+  // returns an array of tiles that should be visible from x, y
+  pub.findVisible2 = function(sourceX, sourceY) { // DOESN'T WORK
+    var tiles = document.getElementsByClassName('tile');
+    var losTiles = [];
+    for (var i = 0; i < tiles.length; i++) {
+      if (!tiles[i].getAttribute('data-room')) {
+        // targetX = tiles[i].id.match(/[0-9]+/);
+        // targetY = tiles[i].id.match(/[0-9]+$/);
+        // pub.drawLine(x, y, targetX, targetY);
+        losTiles.push(tiles[i]);
+      }
+    }
 
-    id = 'door-' + (+x - 1) + '-' + y + '-' + x + '-' + y;
-    if (door = document.getElementById(id)) doors.push(door);
-    id = 'door-' + x + '-' + (+y - 1) + '-' + x + '-' + y;
-    if (door = document.getElementById(id)) doors.push(door);
-    id = 'door-' + x + '-' + y + '-' + (+x + 1) + '-' + y;
-    if (door = document.getElementById(id)) doors.push(door);
-    id = 'door-' + x + '-' + y + '-' + x + '-' + (+y + 1);
-    if (door = document.getElementById(id)) doors.push(door);
+    for (var i = 0; i < losTiles.length; i++) {
+      var x1 = +sourceX;
+      var y1 = +sourceY;
+      
+      var x2 = +(losTiles[i].id.match(/[0-9]+/)[0]);
+      var y2 = +(losTiles[i].id.match(/[0-9]+$/)[0]);
 
-    return doors;
+
+      console.log('x1: ' + x1 + ' y1: ' + y1);
+      console.log('x2: ' + x2 + ' y2: ' + y2);
+
+      var deltaX = x2 - x1;
+      if (deltaX == 0) continue;
+      var deltaY = y2 - y1;
+      var error = 0;
+      var deltaErr = Math.abs(deltaY / deltaX);
+      var y = y1;
+      function mark(x, y) {
+        var tile = document.getElementById('tile-' + x + '-' + y);
+        if (tile && !(tile.getAttribute('data-room'))) {
+          debug ? tile.style.opacity = '1' : tile.style.display = '';
+          return true;
+        } else {
+          return false;
+        }
+      }
+      for (var j = x1; j <= x2; j++) { // 0, 1, 2
+        var blocked = false;
+        if (!mark(j, y)) break;
+        error = error + deltaErr;
+        while (error >= 0.5) {
+          if (!mark(j, y)) {
+            blocked = true;
+            break;
+          }
+          y = y + (y2 - y1 < 0 ? -1 : 1);
+          error = error - 1.0;
+        }
+        if (blocked) break;
+      }
+    }
+//   debug ? losTiles[i].style.opacity = '1' : losTiles[i].style.display = '';
+
+    // pub.drawLine(0, 2, 1, 0);
+    return [];
+  }
+
+  function findVisible(sourceX, sourceY) {
+    var tiles = document.getElementsByClassName('tile');
+    var losTiles = [];
+    for (var i = 0; i < tiles.length; i++) {
+      if (!tiles[i].getAttribute('data-room')) {
+        // targetX = tiles[i].id.match(/[0-9]+/);
+        // targetY = tiles[i].id.match(/[0-9]+$/);
+        // pub.drawLine(x, y, targetX, targetY);
+        losTiles.push(tiles[i]);
+      }
+    }
+
+    for (var i = 0; i < losTiles.length; i++) {
+      var x1 = +sourceX;
+      var y1 = +sourceY;
+      
+      var x2 = +(losTiles[i].id.match(/[0-9]+/)[0]);
+      var y2 = +(losTiles[i].id.match(/[0-9]+$/)[0]);
+
+      console.log('x1: ' + x1 + ' y1: ' + y1);
+      console.log('x2: ' + x2 + ' y2: ' + y2);
+
+      function mark(x, y) {
+        var tile = document.getElementById('tile-' + x + '-' + y);
+        if (tile && !(tile.getAttribute('data-room'))) {
+          debug ? tile.style.opacity = '1' : tile.style.display = '';
+          var doors = getDoors(tile);
+          for (var k = 0; k < doors.length; k++) {
+            doors[k].style.display = '';
+            debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
+          }
+          return true;          
+        } else {
+          return false;
+        }
+      }
+
+      var dx = Math.abs(x2 - x1);
+      if (dx == 0) continue;
+      var dy = Math.abs(y2 - y1);
+      var sx = (x1 < x2) ? 1 : -1;
+      var sy = (y1 < y2) ? 1 : -1;
+      var err = dx - dy;
+      var x = x1, y = y1;
+
+      if (!mark(x, y)) break;
+
+      while (!((x == x2) && (y == y2))) {
+        var e2 = err << 1;
+        if (e2 > -dy) {
+          err -= dy;
+          x += sx;
+        }
+        if (e2 < dx) {
+          err += dx;
+          y += sy;
+        }
+        if (!mark(x, y)) break;
+      }
+
+    }
+//   debug ? losTiles[i].style.opacity = '1' : losTiles[i].style.display = '';
+
+    // pub.drawLine(0, 2, 1, 0);
+    return [];
   }
 
   pub.init = function () {
@@ -661,7 +788,7 @@ var initBoard = function(document) {
     }
 
     makeMovementDisplay();
-    if (document.getElementsByClassName('player').length > 0)
+    if (document.getElementsByClassName('player').length > 0  && false)
       drawRange('player-' + (+playerTurn + 1),
                 document.getElementById('movement-display').innerHTML);
 
@@ -701,6 +828,12 @@ var initBoard = function(document) {
         var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
         var room = document.getElementById(id);
         debug ? room.style.opacity = '1' : room.style.display = '';
+      } else {
+        console.log(player.id + ' is in a corridor.');
+        var visibleTiles = findVisible(playerX, playerY);
+        for (var i = 0; i < visibleTiles.length; i++) {
+          debug ? visibleTiles[i].style.opacity = '1' : visibleTiles[i].style.display = '';
+        }
       }
     }
   }
