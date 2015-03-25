@@ -699,7 +699,8 @@ var initBoard = function(document) {
         }
         // light up room border
         var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
-        document.getElementById(id).style.display = '';
+        var room = document.getElementById(id);
+        debug ? room.style.opacity = '1' : room.style.display = '';
       }
     }
   }
