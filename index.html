@@ -13,10 +13,27 @@
   <script>
     var map = map || { layout: [], rules: function(board) {}};
 
-    var map = { layout: ['11111', '11111', '11111',
-                         '11111', '11111', '11111',
-                         '11111', '11111', '11111'
-    ], rules: function(board) {}};
+    // line test map
+    var map = { layout: [
+      '11111', '11111', '11111',
+      '11111', '11111', '11111',
+      '11111', '11111', '11111'
+    ], rules: function(board) {
+      board.calcStraightLine(0, 0, 3, 6);
+    }};
+
+    // LOS test map
+    var map0 = { layout: [
+      '11111', '11111', '11111', '11111', '11111', '11111',
+      '11111', '11111', '11111', '11111'
+    ], rules: function(board) {
+      board.makeRoom(1, 1, 3, 3);
+      board.makeRoom(1, 6, 3, 8);
+      board.makeDoor(2, 3, 2, 4);
+      board.makeDoor(2, 8, 2, 9);
+      board.makeUnit(2, 2);
+      board.makeUnit(2, 7, 'foe');
+    }};
 
     // convert map strings to arrays
     var mapLayout = [];
@@ -50,8 +67,6 @@
         // board.makeUnit(12, 7, 'foe');
         // board.drawLine(0, 0, 2, 1);
         // board.calcStraightLine(4, 8, 0, 0);
-        board.calcStraightLine(0, 0, 4, 8);
-
       }
       board.init();
     }
