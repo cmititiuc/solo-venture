@@ -96,3 +96,12 @@ circle:hover {
   stroke-width: 2;
   stroke: #297400;
 }
+
+#end-turn:hover {
+  fill: purple;
+}
+
+#end-turn {
+  stroke: black;
+  fill: red;
+}

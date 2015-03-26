@@ -219,22 +219,36 @@ var initBoard = function(document) {
         source.setAttribute('data-occupied', '');
         player.setAttributeNS(null, "data-x", x);
         player.setAttributeNS(null, "data-y", y);
-        var moveRoll = (Math.floor(Math.random() * 6) + 1)
-                       + (Math.floor(Math.random() * 6) + 1);
         var moveDisplay = document.getElementById('movement-display');
         if (+moveDisplay.innerHTML - pathLength == 0) {
-          moveDisplay.innerHTML = moveRoll;
+          pub.rollMovement();
           var noPlayers = document.getElementsByClassName('player').length;
           playerTurn = (playerTurn + 1) % noPlayers;
         } else
           moveDisplay.innerHTML = +moveDisplay.innerHTML - pathLength;
       }
-      resetTiles();
-      showVisible(player);
-
-      drawRange('player-' + (+playerTurn + 1),
-        document.getElementById('movement-display').innerHTML);
     }
+    resetTiles();
+    showVisible(player);
+
+    drawRange('player-' + (+playerTurn + 1),
+      document.getElementById('movement-display').innerHTML);
+  }
+
+  pub.rollMovement = function() {
+    var display = document.getElementById('movement-display');
+    display.innerHTML = (Math.floor(Math.random() * 6) + 1)
+                        + (Math.floor(Math.random() * 6) + 1);
+  }
+
+  pub.endTurn = function() {
+    var players = document.getElementsByClassName('player');
+    var noPlayers = document.getElementsByClassName('player').length;
+    playerTurn = (playerTurn + 1) % noPlayers;
+    pub.rollMovement();
+    resetTiles();
+    drawRange('player-' + (+playerTurn + 1),
+      document.getElementById('movement-display').innerHTML);
   }
 
   function doorBetween(x1, y1, x2, y2, state) {
@@ -256,9 +270,7 @@ var initBoard = function(document) {
   }
 
   function makeMovementDisplay() {
-    var moveRoll = (Math.floor(Math.random() * 6) + 1)
-                   + (Math.floor(Math.random() * 6) + 1);
-    var data = svgDocument.createTextNode(moveRoll.toString());
+    var data = svgDocument.createTextNode('');
     var text = svgDocument.createElementNS(svgns, "text");
     text.style.fontSize = "15px";
     text.style.fontWeight = "bold";
@@ -269,6 +281,20 @@ var initBoard = function(document) {
     text.setAttributeNS(null, "id", "movement-display");
     text.appendChild(data);
     document.getElementById('viewport').appendChild(text);
+    pub.rollMovement();
+  }
+
+  function makeEndTurnButton() {
+    var shape = svgDocument.createElementNS(svgns, "rect");
+    shape.setAttributeNS(null, "x", 5);
+    shape.setAttributeNS(null, "y", viewportHeight - 50);
+    shape.setAttributeNS(null, "width",  20);
+    shape.setAttributeNS(null, "height", 20);
+    shape.setAttributeNS(null, "id", "end-turn");
+    
+    document.getElementById('viewport').appendChild(shape);
+
+    shape.addEventListener('click', pub.endTurn, false);
   }
 
   function getPathLength(x1, y1, x2, y2) {
@@ -848,6 +874,8 @@ var initBoard = function(document) {
     if (document.getElementsByClassName('player').length > 0)
       drawRange('player-' + (+playerTurn + 1),
                 document.getElementById('movement-display').innerHTML);
+
+    makeEndTurnButton();
   }
 
   return pub;

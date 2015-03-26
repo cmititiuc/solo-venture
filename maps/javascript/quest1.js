@@ -61,6 +61,7 @@ var map = {
     board.makeDoor(16, 8, 15, 8);
     board.makeUnit(2, 14);
     board.makeUnit(1, 14);
+    board.makeUnit(2, 13);
     board.makeUnit(2, 1, 'foe');
     board.makeUnit(3, 1, 'foe');
     board.makeUnit(6, 0, 'foe');
