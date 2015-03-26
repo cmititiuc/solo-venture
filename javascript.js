@@ -4,7 +4,9 @@ var initBoard = function(document) {
   var viewport = document.getElementById('viewport');
   viewportWidth = viewport.width.baseVal.value;
   viewportHeight = viewport.height.baseVal.value;
-  playerTurn = 0;
+  var svgns = "http://www.w3.org/2000/svg";
+  var svgDocument = document.getElementById('viewport').ownerDocument;
+  var playerTurn = 0;
 
   function coord(axis, value) {
     if (axis == "x") {
@@ -19,8 +21,6 @@ var initBoard = function(document) {
   }
 
   function makeMark(x, y) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
     var target = document.getElementById('tile-' + x + '-' + y);
     var x = target.x.baseVal.value;
     var y = target.y.baseVal.value;
@@ -209,8 +209,6 @@ var initBoard = function(document) {
   }
 
   function makeMovementDisplay() {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
     var moveRoll = (Math.floor(Math.random() * 6) + 1)
                    + (Math.floor(Math.random() * 6) + 1);
     var data = svgDocument.createTextNode(moveRoll.toString());
@@ -359,9 +357,6 @@ var initBoard = function(document) {
   }
 
   pub.makeRectangle = function(x, y) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
-
     var shape = svgDocument.createElementNS(svgns, "rect");
     shape.setAttributeNS(null, "x", coord('x', x));
     shape.setAttributeNS(null, "y", coord('y', y));
@@ -377,9 +372,6 @@ var initBoard = function(document) {
   /* TODO: I did this wrong.  Params should be (x, y, width, height).
      Same for makeFurniture(). */
   pub.makeRoom = function (x1, y1, x2, y2) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
-
     var shape = svgDocument.createElementNS(svgns, "rect");
     shape.setAttributeNS(null, "x", coord('x', Math.min(x1, x2)));
     shape.setAttributeNS(null, "y", coord('y', Math.min(y1, y2)));
@@ -404,8 +396,6 @@ var initBoard = function(document) {
   }
 
   pub.makeUnit = function(x, y, iff) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
     var target = document.getElementById('tile-' + x + '-' + y);
     var cx = target.x.baseVal.value;
     var cy = target.y.baseVal.value;
@@ -453,8 +443,6 @@ var initBoard = function(document) {
 
   pub.makeDoor = function(x1, y1, x2, y2, state) {
     // TODO: test to make sure tiles are adjacent
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
     var orientation = 'horizontal';
     var state = typeof state !== 'undefined' ? state : 'closed';
     if (y1 == y2) orientation = 'vertical';
@@ -496,9 +484,6 @@ var initBoard = function(document) {
   }
 
   pub.makeFurniture = function (x1, y1, x2, y2) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
-
     if (x1 == x2) {
       var temp = Math.min(y1, y2);
       var y2 = Math.max(y1, y2);
@@ -589,8 +574,6 @@ var initBoard = function(document) {
   }
 
   pub.calcStraightLine = function(x1, y1, x2, y2) {
-    var svgns = "http://www.w3.org/2000/svg";
-    var svgDocument = document.getElementById('viewport').ownerDocument;
     var shape = svgDocument.createElementNS(svgns, "line");
     shape.setAttributeNS(null, "x1", coord('x', x1) + tileWidth / 2);
     shape.setAttributeNS(null, "y1", coord('y', y1) + tileHeight / 2);
@@ -687,8 +670,7 @@ var initBoard = function(document) {
         if (blocked) break;
       }
     }
-//   debug ? losTiles[i].style.opacity = '1' : losTiles[i].style.display = '';
-
+    // debug ? losTiles[i].style.opacity = '1' : losTiles[i].style.display = '';
     // pub.drawLine(0, 2, 1, 0);
     return [];
   }
@@ -770,7 +752,9 @@ var initBoard = function(document) {
               debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
             }
           } else {
-            // furniture
+            // furniture or blank space?
+              // if furniture, light up whole furniture
+              // if blank space, ignore
           }
         }
       }
