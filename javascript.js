@@ -124,10 +124,10 @@ var initBoard = function(document) {
   function lightRoom(id) {
     var firstCoords = id.match(/[0-9]+-[0-9]+/)[0];
     var secondCoords = id.match(/[0-9]+-[0-9]+$/)[0];
-    var x1 = firstCoords.match(/[0-9]+/)[0];
-    var y1 = firstCoords.match(/[0-9]+$/)[0];
-    var x2 = secondCoords.match(/[0-9]+/)[0];
-    var y2 = secondCoords.match(/[0-9]+$/)[0];
+    var x1 = +(firstCoords.match(/[0-9]+/)[0]);
+    var y1 = +(firstCoords.match(/[0-9]+$/)[0]);
+    var x2 = +(secondCoords.match(/[0-9]+/)[0]);
+    var y2 = +(secondCoords.match(/[0-9]+$/)[0]);
     console.log('x1: ' + x1 + ' y1: ' + y1 + ' x2: ' + x2 + ' y2: ' + y2);
 
     for (var i = x1; i <= x2; i++) {
@@ -181,12 +181,18 @@ var initBoard = function(document) {
           this.style.stroke = 'green';
           var id = 'tile-' + x1 + '-' + y1;
           var tile1 = document.getElementById(id);
-          roomId = tile1.getAttribute('data-room');
-          if (roomId) lightRoom(roomId);
+          if (tile1) {
+            debug ? tile1.style.opacity = '1' : tile1.style.display = '';
+            var roomId = tile1.getAttribute('data-room');
+            if (roomId) lightRoom(roomId);
+          }
           var id = 'tile-' + x2 + '-' + y2;
           var tile2 = document.getElementById(id);
-          roomId = tile2.getAttribute('data-room');
-          if (roomId) lightRoom(roomId);
+          if (tile2) {
+            debug ? tile2.style.opacity = '1' : tile2.style.display = '';
+            var roomId = tile2.getAttribute('data-room');
+            if (roomId) lightRoom(roomId);
+          }
         }
       }
     }
@@ -203,12 +209,12 @@ var initBoard = function(document) {
         // Might want to do this differently in the future.
         var pathLength = getPathLength(playerX, playerY, x, y);
 
-        console.log('target x: ' + x + ' y: ' + y);
-        console.log('source x: ' + playerX + ' y: ' + playerY);
-        console.log(player.getAttribute('transform'));
+        // console.log('target x: ' + x + ' y: ' + y);
+        // console.log('source x: ' + playerX + ' y: ' + playerY);
+        // console.log(player.getAttribute('transform'));
         player.setAttribute("transform", "translate("
           + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
-        console.log(player.getAttribute('transform'));
+        // console.log(player.getAttribute('transform'));
         this.setAttribute('data-occupied', 'friendly');
         source.setAttribute('data-occupied', '');
         player.setAttributeNS(null, "data-x", x);
@@ -225,6 +231,7 @@ var initBoard = function(document) {
       }
       resetTiles();
       showVisible(player);
+
       drawRange('player-' + (+playerTurn + 1),
         document.getElementById('movement-display').innerHTML);
     }
@@ -786,6 +793,18 @@ var initBoard = function(document) {
           doors[k].style.display = '';
           debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
         }
+      }
+    }
+
+    // light up enemies
+    var enemies = document.getElementsByClassName('enemy');
+    for (var i = 0; i < enemies.length; i++) {
+      var enemyX = enemies[i].getAttribute('data-x');
+      var enemyY = enemies[i].getAttribute('data-y');
+      var id = 'tile-' + enemyX + '-' + enemyY;
+      var tile = document.getElementById(id);
+      if (debug ? tile.style.opacity == '1' : tile.style.display == '') {
+        debug ? enemies[i].style.opacity = '1' : enemies[i].style.display = '';
       }
     }
   }
