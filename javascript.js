@@ -253,6 +253,12 @@ var initBoard = function(document) {
 
   function moveMonsters() {
     console.log('monsters turn');
+    // for each active monster
+      // use distance formula to find the closest player
+      // determine if there is a path to that player
+      // if so, take as many steps as possible along that path towards the player
+      // if there is not a path to that player, try the next closest player and so on until a path has been found or all players have been tried
+      // if a path cannot be traced to any player, move as close as possible
   }
 
   function doorBetween(x1, y1, x2, y2, state) {
