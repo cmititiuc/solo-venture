@@ -184,6 +184,7 @@ var initBoard = function(document) {
           moveDisplay.innerHTML = +moveDisplay.innerHTML - pathLength;
       }
       resetTiles();
+      showVisible(player);
       drawRange('player-' + (+playerTurn + 1),
         document.getElementById('movement-display').innerHTML);
     }
@@ -516,6 +517,7 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "height",
       tileHeight * (Math.abs(y1 - y2) + 1) - tileHeight * .20);
     shape.setAttributeNS(null, "class", "furniture");
+    debug ? shape.style.opacity = '.2' : shape.style.display = 'none';
     // shape.setAttributeNS(null, "id", "");
     
     document.getElementById('viewport').appendChild(shape);
@@ -740,6 +742,56 @@ var initBoard = function(document) {
     return visibleTiles;
   }
 
+  function showVisible(player) {
+    var playerX = player.getAttribute('data-x');
+    var playerY = player.getAttribute('data-y');
+
+    var id = 'tile-' + playerX + '-' + playerY;
+    var tile = document.getElementById(id);
+    // if player is in a room
+    if (room = tile.getAttribute('data-room')) {
+      console.log(player.id + ' is in a room');
+      // light up room's tiles
+      var firstCoords = room.match(/[0-9]+-[0-9]+/)[0];
+      var secondCoords = room.match(/[0-9]+-[0-9]+$/)[0];
+      var x1 = +(firstCoords.match(/[0-9]+/)[0]);
+      var y1 = +(firstCoords.match(/[0-9]+$/)[0]);
+      var x2 = +(secondCoords.match(/[0-9]+/)[0]);
+      var y2 = +(secondCoords.match(/[0-9]+$/)[0]);
+
+      for (var i = x1; i <= x2; i++) {
+        for (var j = y1; j <= y2; j++) {
+          var id = 'tile-' + i + '-' + j;
+          var tile = document.getElementById(id);
+          if (tile) {
+            debug ? tile.style.opacity = '1' : tile.style.display = '';
+            var doors = getDoors(tile);
+            for (var k = 0; k < doors.length; k++) {
+              debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
+            }
+          } else {
+            // furniture
+          }
+        }
+      }
+      // light up room border
+      var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+      var room = document.getElementById(id);
+      debug ? room.style.opacity = '1' : room.style.display = '';
+    } else {
+      console.log(player.id + ' is in a corridor');
+      var visibleTiles = findVisible(playerX, playerY);
+      for (var i = 0; i < visibleTiles.length; i++) {
+        debug ? visibleTiles[i].style.opacity = '1' : visibleTiles[i].style.display = '';
+        var doors = getDoors(visibleTiles[i]);
+        for (var k = 0; k < doors.length; k++) {
+          doors[k].style.display = '';
+          debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
+        }
+      }
+    }
+  }
+
   pub.init = function () {
     // move unit listener
     var tiles = document.getElementsByClassName('tile');
@@ -772,51 +824,7 @@ var initBoard = function(document) {
     // LOS
     var players = document.getElementsByClassName('player');
     for (var i = 0; i < players.length; i++) {
-      var player = players[i];
-      var playerX = player.getAttribute('data-x');
-      var playerY = player.getAttribute('data-y');
-
-      var id = 'tile-' + playerX + '-' + playerY;
-      var tile = document.getElementById(id);
-      // if player is in a room
-      if (room = tile.getAttribute('data-room')) {
-        // light up room's tiles
-        var firstCoords = room.match(/[0-9]+-[0-9]+/)[0];
-        var secondCoords = room.match(/[0-9]+-[0-9]+$/)[0];
-        var x1 = firstCoords.match(/[0-9]+/)[0];
-        var y1 = firstCoords.match(/[0-9]+$/)[0];
-        var x2 = secondCoords.match(/[0-9]+/)[0];
-        var y2 = secondCoords.match(/[0-9]+$/)[0];
-        for (var i = x1; i <= x2 - x1 + 1; i++) {
-          for (var j = y1; j <= y2 - y1 + 1; j++) {
-            var id = 'tile-' + i + '-' + j;
-            var tile = document.getElementById(id);
-            // light up that tile
-            tile.style.display = '';
-            debug ? tile.style.opacity = '1' : tile.style.display = '';
-            var doors = getDoors(tile);
-            for (var k = 0; k < doors.length; k++) {
-              doors[k].style.display = '';
-              debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
-            }
-          }
-        }
-        // light up room border
-        var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
-        var room = document.getElementById(id);
-        debug ? room.style.opacity = '1' : room.style.display = '';
-      } else {
-        console.log(player.id + ' is in a corridor.');
-        var visibleTiles = findVisible(playerX, playerY);
-        for (var i = 0; i < visibleTiles.length; i++) {
-          debug ? visibleTiles[i].style.opacity = '1' : visibleTiles[i].style.display = '';
-          var doors = getDoors(visibleTiles[i]);
-          for (var k = 0; k < doors.length; k++) {
-            doors[k].style.display = '';
-            debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
-          }
-        }
-      }
+      showVisible(players[i]);
     }
 
     makeMovementDisplay();
