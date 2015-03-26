@@ -121,6 +121,38 @@ var initBoard = function(document) {
     // })();
   }
 
+  function lightRoom(id) {
+    var firstCoords = id.match(/[0-9]+-[0-9]+/)[0];
+    var secondCoords = id.match(/[0-9]+-[0-9]+$/)[0];
+    var x1 = firstCoords.match(/[0-9]+/)[0];
+    var y1 = firstCoords.match(/[0-9]+$/)[0];
+    var x2 = secondCoords.match(/[0-9]+/)[0];
+    var y2 = secondCoords.match(/[0-9]+$/)[0];
+    console.log('x1: ' + x1 + ' y1: ' + y1 + ' x2: ' + x2 + ' y2: ' + y2);
+
+    for (var i = x1; i <= x2; i++) {
+      for (var j = y1; j <= y2; j++) {
+        var id = 'tile-' + i + '-' + j;
+        var tile = document.getElementById(id);
+        if (tile) {
+          debug ? tile.style.opacity = '1' : tile.style.display = '';
+          var doors = getDoors(tile);
+          for (var k = 0; k < doors.length; k++) {
+            debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
+          }
+        } else {
+          // furniture or blank space?
+            // if furniture, light up whole furniture
+            // if blank space, ignore
+        }
+      }
+    }
+    // light up room border
+    var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
+    var room = document.getElementById(id);
+    debug ? room.style.opacity = '1' : room.style.display = '';
+  }
+
   function updateMap() {
     var player = document.getElementsByClassName('player')[playerTurn];
     if (!player) {
@@ -147,6 +179,14 @@ var initBoard = function(document) {
         } else {
           this.setAttribute('data-state', 'open');
           this.style.stroke = 'green';
+          var id = 'tile-' + x1 + '-' + y1;
+          var tile1 = document.getElementById(id);
+          roomId = tile1.getAttribute('data-room');
+          if (roomId) lightRoom(roomId);
+          var id = 'tile-' + x2 + '-' + y2;
+          var tile2 = document.getElementById(id);
+          roomId = tile2.getAttribute('data-room');
+          if (roomId) lightRoom(roomId);
         }
       }
     }
@@ -730,40 +770,14 @@ var initBoard = function(document) {
 
     var id = 'tile-' + playerX + '-' + playerY;
     var tile = document.getElementById(id);
-    // if player is in a room
-    if (room = tile.getAttribute('data-room')) {
-      console.log(player.id + ' is in a room');
-      // light up room's tiles
-      var firstCoords = room.match(/[0-9]+-[0-9]+/)[0];
-      var secondCoords = room.match(/[0-9]+-[0-9]+$/)[0];
-      var x1 = +(firstCoords.match(/[0-9]+/)[0]);
-      var y1 = +(firstCoords.match(/[0-9]+$/)[0]);
-      var x2 = +(secondCoords.match(/[0-9]+/)[0]);
-      var y2 = +(secondCoords.match(/[0-9]+$/)[0]);
 
-      for (var i = x1; i <= x2; i++) {
-        for (var j = y1; j <= y2; j++) {
-          var id = 'tile-' + i + '-' + j;
-          var tile = document.getElementById(id);
-          if (tile) {
-            debug ? tile.style.opacity = '1' : tile.style.display = '';
-            var doors = getDoors(tile);
-            for (var k = 0; k < doors.length; k++) {
-              debug ? doors[k].style.opacity = '1' : doors[k].style.display = '';
-            }
-          } else {
-            // furniture or blank space?
-              // if furniture, light up whole furniture
-              // if blank space, ignore
-          }
-        }
-      }
-      // light up room border
-      var id = 'room-' + x1 + '-' + y1 + '-' + x2 + '-' + y2;
-      var room = document.getElementById(id);
-      debug ? room.style.opacity = '1' : room.style.display = '';
+    if (roomId = tile.getAttribute('data-room')) {
+      console.log(player.id + ' is in a room');
+      lightRoom(roomId);
     } else {
       console.log(player.id + ' is in a corridor');
+
+      // light visible corridor tiles and doors
       var visibleTiles = findVisible(playerX, playerY);
       for (var i = 0; i < visibleTiles.length; i++) {
         debug ? visibleTiles[i].style.opacity = '1' : visibleTiles[i].style.display = '';
