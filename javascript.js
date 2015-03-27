@@ -128,7 +128,7 @@ var initBoard = function(document) {
     var y1 = +(firstCoords.match(/[0-9]+$/)[0]);
     var x2 = +(secondCoords.match(/[0-9]+/)[0]);
     var y2 = +(secondCoords.match(/[0-9]+$/)[0]);
-    console.log('x1: ' + x1 + ' y1: ' + y1 + ' x2: ' + x2 + ' y2: ' + y2);
+    // console.log('x1: ' + x1 + ' y1: ' + y1 + ' x2: ' + x2 + ' y2: ' + y2);
 
     for (var i = x1; i <= x2; i++) {
       for (var j = y1; j <= y2; j++) {
@@ -220,11 +220,9 @@ var initBoard = function(document) {
         player.setAttributeNS(null, "data-x", x);
         player.setAttributeNS(null, "data-y", y);
         var moveDisplay = document.getElementById('movement-display');
-        if (+moveDisplay.innerHTML - pathLength == 0) {
-          pub.rollMovement();
-          var noPlayers = document.getElementsByClassName('player').length;
-          playerTurn = (playerTurn + 1) % noPlayers;
-        } else
+        if (+moveDisplay.innerHTML - pathLength == 0)
+          pub.endTurn();
+        else
           moveDisplay.innerHTML = +moveDisplay.innerHTML - pathLength;
       }
     }
@@ -245,10 +243,16 @@ var initBoard = function(document) {
     var players = document.getElementsByClassName('player');
     var noPlayers = document.getElementsByClassName('player').length;
     playerTurn = (playerTurn + 1) % noPlayers;
-    pub.rollMovement();
     resetTiles();
+    if (playerTurn == 0) moveMonsters();
+    pub.rollMovement();
     drawRange('player-' + (+playerTurn + 1),
       document.getElementById('movement-display').innerHTML);
+    console.log(players[playerTurn].id + ' turn');
+  }
+
+  function moveMonsters() {
+    console.log('monsters turn');
   }
 
   function doorBetween(x1, y1, x2, y2, state) {
@@ -480,13 +484,8 @@ var initBoard = function(document) {
     shape.setAttributeNS(null, "cy", coord('y', 0) + tileHeight / 2);
     shape.setAttributeNS(null, "r", "10");
 
-    var symbol;
-    if (iff == 'friendly')
-      symbol = document.getElementsByClassName('player').length + 1;
-    else {
-      var options = ['!', '@', '#', '$', '%', '^', '&', '*'];
-      symbol = options[Math.floor(Math.random() * options.length)];
-    }
+    var className = iff == 'friendly' ? 'player' : 'enemy';
+    symbol = document.getElementsByClassName(className).length + 1;
 
     var data = svgDocument.createTextNode(symbol);
 
@@ -503,7 +502,7 @@ var initBoard = function(document) {
     group.setAttribute("class", iff == 'friendly' ? "player" : "enemy");
     if (iff != 'friendly')
       debug ? group.style.opacity = '.2' : group.style.display = 'none';
-    group.setAttribute("id", "player-" + symbol);
+    group.setAttribute("id", iff == 'friendly' ? "player-" + symbol : "enemy-" + symbol);
     group.setAttributeNS(null, "data-x", x);
     group.setAttributeNS(null, "data-y", y);
     group.appendChild(shape);
@@ -805,11 +804,8 @@ var initBoard = function(document) {
     var tile = document.getElementById(id);
 
     if (roomId = tile.getAttribute('data-room')) {
-      console.log(player.id + ' is in a room');
       lightRoom(roomId);
     } else {
-      console.log(player.id + ' is in a corridor');
-
       // light visible corridor tiles and doors
       var visibleTiles = findVisible(playerX, playerY);
       for (var i = 0; i < visibleTiles.length; i++) {
@@ -830,7 +826,10 @@ var initBoard = function(document) {
       var id = 'tile-' + enemyX + '-' + enemyY;
       var tile = document.getElementById(id);
       if (debug ? tile.style.opacity == '1' : tile.style.display == '') {
-        debug ? enemies[i].style.opacity = '1' : enemies[i].style.display = '';
+        if (debug ? enemies[i].style.opacity != '1' : !!enemies[i].style.display) {
+          debug ? enemies[i].style.opacity = '1' : enemies[i].style.display = '';
+          console.log(enemies[i].id + ' is active');
+        }
       }
     }
   }
@@ -871,9 +870,11 @@ var initBoard = function(document) {
     }
 
     makeMovementDisplay();
-    if (document.getElementsByClassName('player').length > 0)
+    if (document.getElementsByClassName('player').length > 0) {
       drawRange('player-' + (+playerTurn + 1),
                 document.getElementById('movement-display').innerHTML);
+      console.log('player-' + (+playerTurn + 1) + ' turn');
+    }
 
     makeEndTurnButton();
   }
