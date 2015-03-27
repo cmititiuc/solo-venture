@@ -773,6 +773,8 @@ var initBoard = function(document) {
     }
 
     for (var i = 0; i < corridorTiles.length; i++) {
+    /* http://stackoverflow.com/questions/4672279/
+       bresenham-algorithm-in-javascript */
       var x1 = +sourceX, y1 = +sourceY;
       var x2 = +(corridorTiles[i].id.match(/[0-9]+/)[0]);
       var y2 = +(corridorTiles[i].id.match(/[0-9]+$/)[0]);
