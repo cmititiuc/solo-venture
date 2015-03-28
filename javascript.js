@@ -252,13 +252,30 @@ var initBoard = function(document) {
   }
 
   function moveMonsters() {
-    console.log('monsters turn');
     // for each active monster
       // use distance formula to find the closest player
       // determine if there is a path to that player
       // if so, take as many steps as possible along that path towards the player
       // if there is not a path to that player, try the next closest player and so on until a path has been found or all players have been tried
       // if a path cannot be traced to any player, move as close as possible
+
+    var monsters = document.getElementsByClassName('enemy');
+    for (var i = 0; i < monsters.length; i++) {
+      if (debug ? monsters[i].style.opacity == '1' : !monsters[i].style.display) {
+        console.log(monsters[i].id + ' turn');
+        var paths = findTargetPaths(monsters[i]);
+        if (paths.length == 0) {
+          console.log(monsters[i].id + ' found no viable paths');
+        } else {
+          paths.forEach(function(path, index, array) {
+            var target = path.shift();
+            console.log('(' + target + '): ' + path.join(' -> '));
+          });
+          // determine best path
+          // move
+        }
+      }
+    }
   }
 
   function doorBetween(x1, y1, x2, y2, state) {
@@ -419,6 +436,77 @@ var initBoard = function(document) {
         // if (found == false) setTimeout(step, 1);
       }
     // })();
+  }
+
+  // return array of arrays of coordinates
+  // [
+  //   ['player-1', 'open', [[1, 1], [1, 2], [2, 2], [2, 3]] ],
+  //   ['player-2', 'closed' [[1, 2], [1, 3], [2, 3]] ]
+  // ]
+  function findTargetPaths(source) {
+    var paths = [];
+    var probed = {};
+    var sourceX = source.getAttribute('data-x');
+    var sourceY = source.getAttribute('data-y');
+    var targetX = 4;
+    var targetY = 5;
+    // console.log('sourceX: ' + sourceX + ' sourceY: ' + sourceY);
+    // var source = document.getElementById('tile-' + x1 + '-' + y1);
+    // source.setAttribute('class', 'probed');
+    // probed[sourceX + '-' + sourceY] = true;
+    var q = [];
+    var found = false;
+    var range = typeof range !== 'undefined' ? range : 0;
+    q.push([sourceX, sourceY, []]);
+    probe([sourceX, sourceY, []], sourceX, sourceY);
+
+    function find(v, x, y) {
+      if (+x == +targetX && +y == +targetY) {
+        var history = v[2].slice();
+        history.push([ v[0], v[1] ]);
+        history.unshift(targetX + ',' + targetY);
+        paths.push(history);
+        // found = true;
+        // q = []; // only need if running as while loop
+        // for (var i = 0; i < v[2].length; i++) {
+        //   markTile(v[2][i][0], v[2][i][1], 'path');
+        // }
+        // markTile(x2, y2, 'path');
+        // markTile(v[0], v[1], 'path');
+      }
+    }
+
+    function probe(v, x, y) {
+      var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
+      var target = document.getElementById('tile-' + x + '-' + y);
+      if (target && (range == 0 || v[2].length <= range)) {
+        var occupied = target.getAttribute('data-occupied');
+        occupied = occupied ? occupied == 'friendly' : false;
+        if (!doorBetween(v[0], v[1], x, y, 'closed')) {
+          if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
+            find(v, x, y);
+            if (!probed[x + '-' + y] && !occupied) {
+              var history = v[2].slice();
+              history.push([ v[0], v[1] ]);
+              q.push([ x, y, history ]);
+              probed[x + '-' + y] = true;
+            }
+          }
+        }
+      }
+    }
+
+    while (q.length !== 0) {
+      var v = q.shift();
+      var id = 'tile-' + v[0] + '-' + v[1];
+      var node = document.getElementById(id);
+
+      probe(v, v[0]     , +v[1] - 1); // north
+      probe(v, v[0]     , +v[1] + 1); // south
+      probe(v, +v[0] + 1, v[1]     ); // east
+      probe(v, +v[0] - 1, v[1]     ); // west
+    }
+    return paths;
   }
 
   function getDoors(tile) {
