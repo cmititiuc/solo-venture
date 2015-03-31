@@ -448,31 +448,25 @@ var initBoard = function(document) {
     var probed = {};
     var sourceX = source.getAttribute('data-x');
     var sourceY = source.getAttribute('data-y');
-    var targetX = 4;
-    var targetY = 5;
-    // console.log('sourceX: ' + sourceX + ' sourceY: ' + sourceY);
-    // var source = document.getElementById('tile-' + x1 + '-' + y1);
-    // source.setAttribute('class', 'probed');
-    // probed[sourceX + '-' + sourceY] = true;
+    var targetX = 0;
+    var targetY = 3;
     var q = [];
     var found = false;
     var range = typeof range !== 'undefined' ? range : 0;
     q.push([sourceX, sourceY, []]);
+    probed[sourceX + '-' + sourceY] = true;
     probe([sourceX, sourceY, []], sourceX, sourceY);
 
     function find(v, x, y) {
       if (+x == +targetX && +y == +targetY) {
         var history = v[2].slice();
         history.push([ v[0], v[1] ]);
+        var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
+        var occupied = node.getAttribute('data-occupied');
+        if (occupied && occupied == 'foe' && history[0] != 'closed')
+          history.unshift('closed');
         history.unshift(targetX + ',' + targetY);
         paths.push(history);
-        // found = true;
-        // q = []; // only need if running as while loop
-        // for (var i = 0; i < v[2].length; i++) {
-        //   markTile(v[2][i][0], v[2][i][1], 'path');
-        // }
-        // markTile(x2, y2, 'path');
-        // markTile(v[0], v[1], 'path');
       }
     }
 
@@ -481,11 +475,10 @@ var initBoard = function(document) {
       var target = document.getElementById('tile-' + x + '-' + y);
       if (target && (range == 0 || v[2].length <= range)) {
         var occupied = target.getAttribute('data-occupied');
-        occupied = occupied ? occupied == 'friendly' : false;
         if (!doorBetween(v[0], v[1], x, y, 'closed')) {
           if (sameRoom(node, target) || doorBetween(v[0], v[1], x, y, 'open')) {
             find(v, x, y);
-            if (!probed[x + '-' + y] && !occupied) {
+            if (!probed[x + '-' + y] && (occupied ? occupied != 'friendly' : true)) {
               var history = v[2].slice();
               history.push([ v[0], v[1] ]);
               q.push([ x, y, history ]);
