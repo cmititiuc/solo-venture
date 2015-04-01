@@ -225,6 +225,34 @@ var initBoard = function(document) {
         else
           moveDisplay.innerHTML = +moveDisplay.innerHTML - pathLength;
       }
+    } else if (occupied == 'foe') {
+      var targetX = this.id.match(/[0-9]+/);
+      var targetY = this.id.match(/[0-9]+$/);
+      var target;
+      var monsters = document.getElementsByClassName('enemy');
+      
+      for (var i = 0; i < monsters.length; i++) {
+        if (monsters[i].getAttribute('data-x') == targetX && monsters[i].getAttribute('data-y') == targetY) target = monsters[i];
+      }
+
+      // console.log('playerX: ' + playerX + ' playerY: ' + playerY + ' targetX: ' + targetX + ' targetY: ' + targetY);
+      // console.log(sameRoom(target, player));
+      if (((+playerX == +targetX - 1 && +playerY == +targetY)
+        || (+playerX == +targetX + 1 && +playerY == +targetY)
+        || (+playerX == +targetX && +playerY == +targetY - 1)
+        || (+playerX == +targetX && +playerY == +targetY + 1)
+        ) && (sameRoom(target, player) || doorBetween(+playerX, +playerY, +targetX, +targetY, 'open'))) {
+
+        console.log(player.id + ' attacks ' + target.id);
+
+        // TODO
+        // roll to hit
+        // reduce monster hp
+        // if hp <= 0 delete the monster from the map
+
+        target.remove();
+        this.setAttribute('data-occupied', '');
+      }
     }
     resetTiles();
     showVisible(player);
@@ -252,13 +280,6 @@ var initBoard = function(document) {
   }
 
   function moveMonsters() {
-    // for each active monster
-      // use distance formula to find the closest player
-      // determine if there is a path to that player
-      // if so, take as many steps as possible along that path towards the player
-      // if there is not a path to that player, try the next closest player and so on until a path has been found or all players have been tried
-      // if a path cannot be traced to any player, move as close as possible
-
     var monsters = document.getElementsByClassName('enemy');
     for (var i = 0; i < monsters.length; i++) {
       if (debug ? monsters[i].style.opacity == '1' : !monsters[i].style.display) {
@@ -325,8 +346,9 @@ var initBoard = function(document) {
                 debug ? monsters[i].style.opacity = '1' : monsters[i].style.display = '';
               break;
             }
-
           }
+          // if monster is standing next to a player and they're in the same room or there's an open door between them
+            // monster attacks player
         }
       }
     }
