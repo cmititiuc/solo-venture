@@ -267,18 +267,34 @@ var initBoard = function(document) {
         if (paths.length == 0) {
           console.log(monsters[i].id + ' found no viable paths');
         } else {
-          var bestPath;
+          var bestPath = [];
+          var closed = false;
           paths.forEach(function(path, index, array) {
             var target = path.shift();
             console.log('(' + target + '): ' + path.join(' -> '));
-            // console.log(path);
-            // if (!bestPath || (path[0] != 'closed' && path.length < bestPath.length)) {
-            //   bestPath = path.slice();
-            // }
+            // if path is closed and only coord is the one monster is standing in, then stay put
+            if (path[0] == 'closed' && path.length == 2
+              && path[1][0] == monsters[i].getAttribute('data-x') && path[1][1] == monsters[i].getAttribute('data-y')) {
+              bestPath = path.slice();
+              bestPath.shift();
+            }
+            if (bestPath.length == 0 || (closed && path[0] != 'closed')
+              || (!closed && path[0] != 'closed' && path.length < bestPath.length)) {
+              bestPath = path.slice();
+              if (path[0] == 'closed') {
+                closed = true;
+                bestPath.shift();
+              } else {
+                closed = false;
+              }
+            } else if (closed && path[0] == 'closed' && path[0].length - 1 < bestPath.length) {
+              bestPath = path.slice();
+              bestPath.shift();
+              closed = true;
+            }
           });
-          // TODO: determine best path. Now it selects the first path.
           var movement = 6;
-          bestPath = paths[0].slice(0, Math.min(paths[0].length, movement));
+          bestPath = bestPath.slice(0, Math.min(bestPath.length, movement));
           if (bestPath[0] == 'closed') bestPath.shift();
           console.log('bestPath: ' + bestPath);
           // move
