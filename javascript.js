@@ -90,7 +90,7 @@ var initBoard = function(document) {
       var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
       var target = document.getElementById('tile-' + x + '-' + y);
       // console.log('range: ' + range + ' v[2].length: ' + v[2].length);
-      if (target && (range == 0 || v[2].length < range)) {
+      if (target && (v[2].length < range)) {
         var occupied = target.getAttribute('data-occupied');
         occupied = occupied && occupied != 'friendly';
         if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
