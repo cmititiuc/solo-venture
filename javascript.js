@@ -90,7 +90,7 @@ var initBoard = function(document) {
       var node = document.getElementById('tile-' + v[0] + '-' + v[1]);
       var target = document.getElementById('tile-' + x + '-' + y);
       // console.log('range: ' + range + ' v[2].length: ' + v[2].length);
-      if (target && (v[2].length < range)) {
+      if (target && v[2].length < range) {
         var occupied = target.getAttribute('data-occupied');
         occupied = occupied && occupied != 'friendly';
         if (!occupied && !doorBetween(v[0], v[1], x, y, 'closed')) {
@@ -236,7 +236,9 @@ var initBoard = function(document) {
       acted = true;
       
       for (var i = 0; i < monsters.length; i++) {
-        if (monsters[i].getAttribute('data-x') == targetX && monsters[i].getAttribute('data-y') == targetY) target = monsters[i];
+        var sourceX = monsters[i].getAttribute('data-x');
+        var sourceY = monsters[i].getAttribute('data-y');
+        if (sourceX == targetX && sourceY == targetY) target = monsters[i];
       }
 
       // console.log('playerX: ' + playerX + ' playerY: ' + playerY + ' targetX: ' + targetX + ' targetY: ' + targetY);
@@ -302,7 +304,8 @@ var initBoard = function(document) {
             // console.log('(' + target + '): ' + path.join(' -> '));
             // if path is closed and only coord is the one monster is standing in, then stay put
             if (path[0] == 'closed' && path.length == 2
-              && path[1][0] == monsters[i].getAttribute('data-x') && path[1][1] == monsters[i].getAttribute('data-y')) {
+              && path[1][0] == monsters[i].getAttribute('data-x')
+              && path[1][1] == monsters[i].getAttribute('data-y')) {
               bestPath = path.slice();
               bestPath.shift();
             }
@@ -354,8 +357,28 @@ var initBoard = function(document) {
               break;
             }
           }
-          // if monster is standing next to a player and they're in the same room or there's an open door between them
-            // monster attacks player
+
+          var monsterX = monsters[i].getAttribute('data-x');
+          var monsterY = monsters[i].getAttribute('data-y');
+
+          var players = document.getElementsByClassName('player');
+          for (var j = 0; j < players.length; j++) {
+            var playerX = players[j].getAttribute('data-x');
+            var playerY = players[j].getAttribute('data-y');
+
+            if (((+playerX == +monsterX - 1 && +playerY == +monsterY)
+              || (+playerX == +monsterX + 1 && +playerY == +monsterY)
+              || (+playerX == +monsterX && +playerY == +monsterY - 1)
+              || (+playerX == +monsterX && +playerY == +monsterY + 1)
+              ) && (sameRoom(monsters[i], players[j]) || doorBetween(+playerX, +playerY, +monsterX, +monsterY, 'open'))) {
+
+              console.log(monsters[i].id + ' attacks ' + players[j].id);
+              var tile = document.getElementById('tile-' + playerX + '-' + playerY);
+              tile.setAttribute('data-occupied', '');
+              players[j].remove();
+              break;
+            }
+          }
         }
       }
     }
