@@ -264,8 +264,10 @@ var initBoard = function(document) {
     resetTiles();
     showVisible(player);
 
-    drawRange('player-' + (+playerTurn + 1),
-      document.getElementById('movement-display').innerHTML);
+    var players = document.getElementsByClassName('player');
+    if (players.length > 0) {
+      drawRange(players[playerTurn].id, document.getElementById('movement-display').innerHTML);
+    }
   }
 
   pub.rollMovement = function() {
@@ -281,9 +283,10 @@ var initBoard = function(document) {
     resetTiles();
     if (playerTurn == 0) moveMonsters();
     pub.rollMovement();
-    drawRange('player-' + (+playerTurn + 1),
-      document.getElementById('movement-display').innerHTML);
-    console.log(players[playerTurn].id + ' turn');
+    if (players.length > 0) {
+      drawRange(players[playerTurn].id, document.getElementById('movement-display').innerHTML);
+      console.log(players[playerTurn].id + ' turn');
+    }
     moved = false;
     acted = false;
   }
