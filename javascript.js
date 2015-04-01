@@ -267,12 +267,45 @@ var initBoard = function(document) {
         if (paths.length == 0) {
           console.log(monsters[i].id + ' found no viable paths');
         } else {
+          var bestPath;
           paths.forEach(function(path, index, array) {
             var target = path.shift();
             console.log('(' + target + '): ' + path.join(' -> '));
+            // console.log(path);
+            // if (!bestPath || (path[0] != 'closed' && path.length < bestPath.length)) {
+            //   bestPath = path.slice();
+            // }
           });
-          // determine best path
+          // TODO: determine best path. Now it selects the first path.
+          var movement = 6;
+          bestPath = paths[0].slice(0, Math.min(paths[0].length, movement));
+          if (bestPath[0] == 'closed') bestPath.shift();
+          console.log('bestPath: ' + bestPath);
           // move
+          while(bestPath.length != 0 && movement != 0) {
+            var targetCoords = bestPath.pop();
+            console.log('targetCoords: ' + targetCoords);
+            movement--;
+            var target = document.getElementById('tile-' + targetCoords[0]
+              + '-' + targetCoords[1]);
+            var occupied = target.getAttribute('data-occupied');
+            if (!occupied) {
+              monsters[i].setAttribute("transform", "translate("
+                + targetCoords[0] * (tileWidth + 1) + ", "
+                + targetCoords[1] * (tileHeight + 1) + ")");
+              // console.log(player.getAttribute('transform'));
+              target.setAttribute('data-occupied', 'foe');
+              var sourceX = monsters[i].getAttribute('data-x');
+              var sourceY = monsters[i].getAttribute('data-y');
+              var source = document.getElementById('tile-' + sourceX
+                + '-' + sourceY);
+              source.setAttribute('data-occupied', '');
+              monsters[i].setAttributeNS(null, "data-x", targetCoords[0]);
+              monsters[i].setAttributeNS(null, "data-y", targetCoords[1]);
+              break;
+            }
+
+          }
         }
       }
     }
