@@ -7,6 +7,8 @@ var initBoard = function(document) {
   var svgns = "http://www.w3.org/2000/svg";
   var svgDocument = document.getElementById('viewport').ownerDocument;
   var playerTurn = 0;
+  var moved = false;
+  var acted = false;
 
   function coord(axis, value) {
     if (axis == "x") {
@@ -215,21 +217,23 @@ var initBoard = function(document) {
         player.setAttribute("transform", "translate("
           + x * (tileWidth + 1) + ", " + y * (tileHeight + 1) + ")");
         // console.log(player.getAttribute('transform'));
+        moved = true;
         this.setAttribute('data-occupied', 'friendly');
         source.setAttribute('data-occupied', '');
         player.setAttributeNS(null, "data-x", x);
         player.setAttributeNS(null, "data-y", y);
         var moveDisplay = document.getElementById('movement-display');
-        if (+moveDisplay.innerHTML - pathLength == 0)
+        if (+moveDisplay.innerHTML - pathLength == 0 && acted)
           pub.endTurn();
         else
           moveDisplay.innerHTML = +moveDisplay.innerHTML - pathLength;
       }
-    } else if (occupied == 'foe') {
+    } else if (occupied == 'foe' && !acted) {
       var targetX = this.id.match(/[0-9]+/);
       var targetY = this.id.match(/[0-9]+$/);
       var target;
       var monsters = document.getElementsByClassName('enemy');
+      acted = true;
       
       for (var i = 0; i < monsters.length; i++) {
         if (monsters[i].getAttribute('data-x') == targetX && monsters[i].getAttribute('data-y') == targetY) target = monsters[i];
@@ -252,6 +256,7 @@ var initBoard = function(document) {
 
         target.remove();
         this.setAttribute('data-occupied', '');
+        if (moved) pub.endTurn();
       }
     }
     resetTiles();
@@ -277,6 +282,8 @@ var initBoard = function(document) {
     drawRange('player-' + (+playerTurn + 1),
       document.getElementById('movement-display').innerHTML);
     console.log(players[playerTurn].id + ' turn');
+    moved = false;
+    acted = false;
   }
 
   function moveMonsters() {
