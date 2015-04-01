@@ -271,7 +271,7 @@ var initBoard = function(document) {
           var closed = false;
           paths.forEach(function(path, index, array) {
             var target = path.shift();
-            console.log('(' + target + '): ' + path.join(' -> '));
+            // console.log('(' + target + '): ' + path.join(' -> '));
             // if path is closed and only coord is the one monster is standing in, then stay put
             if (path[0] == 'closed' && path.length == 2
               && path[1][0] == monsters[i].getAttribute('data-x') && path[1][1] == monsters[i].getAttribute('data-y')) {
@@ -296,11 +296,11 @@ var initBoard = function(document) {
           var movement = 6;
           bestPath = bestPath.slice(0, Math.min(bestPath.length, movement));
           if (bestPath[0] == 'closed') bestPath.shift();
-          console.log('bestPath: ' + bestPath);
+          // console.log('bestPath: ' + bestPath);
           // move
           while(bestPath.length != 0 && movement != 0) {
             var targetCoords = bestPath.pop();
-            console.log('targetCoords: ' + targetCoords);
+            // console.log('targetCoords: ' + targetCoords);
             movement--;
             var target = document.getElementById('tile-' + targetCoords[0]
               + '-' + targetCoords[1]);
@@ -318,6 +318,11 @@ var initBoard = function(document) {
               source.setAttribute('data-occupied', '');
               monsters[i].setAttributeNS(null, "data-x", targetCoords[0]);
               monsters[i].setAttributeNS(null, "data-y", targetCoords[1]);
+              // TODO: problem is he becomes inactive when becomes invisible
+              if (debug ? target.style.opacity == '0.2' : target.style.display == 'none')
+                debug ? monsters[i].style.opacity = '0.2' : monsters[i].style.display = 'none';
+              else if (debug ? target.style.opacity == '1' : !target.style.display)
+                debug ? monsters[i].style.opacity = '1' : monsters[i].style.display = '';
               break;
             }
 
