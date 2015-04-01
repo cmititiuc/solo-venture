@@ -266,7 +266,8 @@ var initBoard = function(document) {
 
     var players = document.getElementsByClassName('player');
     if (players.length > 0) {
-      drawRange(players[playerTurn].id, document.getElementById('movement-display').innerHTML);
+      var range = document.getElementById('movement-display').innerHTML;
+      drawRange(players[playerTurn].id, range);
     }
   }
 
@@ -284,7 +285,8 @@ var initBoard = function(document) {
     if (playerTurn == 0) moveMonsters();
     pub.rollMovement();
     if (players.length > 0) {
-      drawRange(players[playerTurn].id, document.getElementById('movement-display').innerHTML);
+      var range = document.getElementById('movement-display').innerHTML;
+      drawRange(players[playerTurn].id, range);
       console.log(players[playerTurn].id + ' turn');
     }
     moved = false;
