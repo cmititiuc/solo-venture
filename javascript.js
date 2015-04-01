@@ -445,17 +445,13 @@ var initBoard = function(document) {
   // ]
   function findTargetPaths(source) {
     var paths = [];
-    var probed = {};
     var sourceX = source.getAttribute('data-x');
     var sourceY = source.getAttribute('data-y');
-    var targetX = 0;
-    var targetY = 3;
-    var q = [];
-    var found = false;
-    var range = typeof range !== 'undefined' ? range : 0;
-    q.push([sourceX, sourceY, []]);
-    probed[sourceX + '-' + sourceY] = true;
-    probe([sourceX, sourceY, []], sourceX, sourceY);
+
+    // console.log('sourceX: ' + sourceX + ' sourceY: ' + sourceY);
+    // var source = document.getElementById('tile-' + x1 + '-' + y1);
+    // source.setAttribute('class', 'probed');
+    // probed[sourceX + '-' + sourceY] = true;
 
     function find(v, x, y) {
       if (+x == +targetX && +y == +targetY) {
@@ -489,16 +485,31 @@ var initBoard = function(document) {
       }
     }
 
-    while (q.length !== 0) {
-      var v = q.shift();
-      var id = 'tile-' + v[0] + '-' + v[1];
-      var node = document.getElementById(id);
+    var players = document.getElementsByClassName('player');
 
-      probe(v, v[0]     , +v[1] - 1); // north
-      probe(v, v[0]     , +v[1] + 1); // south
-      probe(v, +v[0] + 1, v[1]     ); // east
-      probe(v, +v[0] - 1, v[1]     ); // west
+    for (var i = 0; i < players.length; i++) {
+      var q = [];
+      var probed = {};
+      var found = false;
+      var range = typeof range !== 'undefined' ? range : 0;
+      var targetX = players[i].getAttribute('data-x');
+      var targetY = players[i].getAttribute('data-y');
+      q.push([sourceX, sourceY, []]);
+      probed[sourceX + '-' + sourceY] = true;
+      probe([sourceX, sourceY, []], sourceX, sourceY);
+
+      while (q.length !== 0) {
+        var v = q.shift();
+        var id = 'tile-' + v[0] + '-' + v[1];
+        var node = document.getElementById(id);
+
+        probe(v, v[0]     , +v[1] - 1); // north
+        probe(v, v[0]     , +v[1] + 1); // south
+        probe(v, +v[0] + 1, v[1]     ); // east
+        probe(v, +v[0] - 1, v[1]     ); // west
+      }
     }
+
     return paths;
   }
 
