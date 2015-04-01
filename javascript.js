@@ -253,11 +253,17 @@ var initBoard = function(document) {
 
         // TODO
         // roll to hit
-        // reduce monster hp
-        // if hp <= 0 delete the monster from the map
+        
+        target.setAttribute('data-hit-points', +(target.getAttribute('data-hit-points')) - 1);
 
-        target.remove();
-        this.setAttribute('data-occupied', '');
+        console.log(target.id + ' takes damage. remaining hit points: ' + target.getAttribute('data-hit-points'));
+
+        if (+(target.getAttribute('data-hit-points')) <= 0) {
+          console.log(target.id + ' has died');
+          target.remove();
+          this.setAttribute('data-occupied', '');
+        }
+
         if (moved) pub.endTurn();
       }
     }
@@ -378,9 +384,18 @@ var initBoard = function(document) {
               ) && (sameRoom(monsters[i], players[j]) || doorBetween(+playerX, +playerY, +monsterX, +monsterY, 'open'))) {
 
               console.log(monsters[i].id + ' attacks ' + players[j].id);
-              var tile = document.getElementById('tile-' + playerX + '-' + playerY);
-              tile.setAttribute('data-occupied', '');
-              players[j].remove();
+              
+              players[j].setAttribute('data-hit-points', +(players[j].getAttribute('data-hit-points')) - 1);
+
+              console.log(players[j].id + ' takes damage. remaining hit points: ' + players[j].getAttribute('data-hit-points'));
+
+              if (+(players[j].getAttribute('data-hit-points')) <= 0) {
+                var tile = document.getElementById('tile-' + playerX + '-' + playerY);
+                tile.setAttribute('data-occupied', '');
+                console.log(players[j].id + ' has died');
+                players[j].remove();
+              }
+
               break;
             }
           }
@@ -714,6 +729,10 @@ var initBoard = function(document) {
     group.setAttribute("id", iff == 'friendly' ? "player-" + symbol : "enemy-" + symbol);
     group.setAttributeNS(null, "data-x", x);
     group.setAttributeNS(null, "data-y", y);
+    if (iff == 'friendly')
+      group.setAttribute('data-hit-points', '5');
+    else
+      group.setAttribute('data-hit-points', '1');
     group.appendChild(shape);
     group.appendChild(text);
 
